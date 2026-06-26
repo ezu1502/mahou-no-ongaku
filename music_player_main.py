@@ -2,7 +2,8 @@ import time
 import os
 import getpass 
 import pygame
-import player_controls as controller
+from pygame.mixer import music as pymusic
+import keyboardreceiver as controller
 from file_handler import load_music_list, showmusiclist, get_song_full_path
 #import Player Controller
 
@@ -38,8 +39,8 @@ def play_song(path):
     if path is None:
         print("Número inválido:")
         return
-    pygame.mixer.music.load(path)
-    pygame.mixer.music.play()
+    pymusic.load(path)
+    pymusic.play()
     justthename = os.path.basename(path)
     stylizedname = f"< {justthename} >"
     print("Now Playing: ", stylizedname)
@@ -65,7 +66,7 @@ def show_list_and_play(loadedlist, folder):
 loaded_music_list = load_music_list(sourcefolder)
 show_list_and_play(loaded_music_list, sourcefolder)
 
-def ask_leave_or_play_new_song():
+def menu():
     global program_is_running
     while True:
         wannacontinue = input("What do you wanna do now?\nP = PLAY ANOTHER SONG\nL = LEAVE\n>")
@@ -79,34 +80,42 @@ def ask_leave_or_play_new_song():
             continue  
 
 
-def tick():
-    time.sleep(1 / FPS)
-    #anda 1 frame
+
+
+def pause_song():
+    global is_it_paused
+    pymusic.pause()
+    is_it_paused = True
+
+def unpause_song():
+    global is_it_paused
+    pymusic.unpause()
+    is_it_paused = False
+def stop_song():
+    global is_it_paused
+    global should_be_playing
+    pymusic.stop()
+    should_be_playing = False
+    is_it_paused = False
 
 def deal_with_song_status():
     global should_be_playing
     global is_it_paused
-    is_it_busy = pygame.mixer.music.get_busy()
-    #reallyplaying = pygame.mixer.music.get_busy()
-#pygame.mixer.music.
+    is_it_busy = pymusic.get_busy()
     check_key = check_key_and_return()
 
-    if(should_be_playing and check_key == "pause"):
-        pygame.mixer.music.pause()
-        is_it_paused = True
-    elif(should_be_playing and check_key == "unpause"):
-        pygame.mixer.music.unpause()
-        is_it_paused = False
-    elif(should_be_playing and check_key == "stop"):
-        pygame.mixer.music.stop()
+    if(should_be_playing and check_key == "pause"): #Spacebar
+       pause_song()
+    elif(should_be_playing and check_key == "unpause"): #Spacebar
+       unpause_song() 
+    elif(should_be_playing and check_key == "stop"): #Música parando por comando do usuário
         print("Music Stopped.")
-        should_be_playing = False
-        is_it_paused = False
-        ask_leave_or_play_new_song()
-    elif(should_be_playing and not is_it_busy and not is_it_paused):
-        print("Cabou a música kkkkkkkk")
-        should_be_playing = False
-        ask_leave_or_play_new_song()
+        stop_song()
+        menu()
+    elif(should_be_playing and not is_it_busy and not is_it_paused): #Música parou sozinha
+        print("Song ended!")
+        stop_song()
+        menu()
         
 
 #Checa o status da música e avisa se tiver acabado, também chama o cumpridor de comandos
@@ -130,7 +139,9 @@ def check_key_and_return():
 
          
 
-
+def tick():
+    time.sleep(1 / FPS)
+    #anda 1 frame
 
 
 def update():

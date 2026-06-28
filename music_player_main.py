@@ -12,6 +12,9 @@ from player_actions import pause_song, play_song, stop_song, unpause_song
 
 program_is_running = True
 FPS = 60
+FRAME_TIME = 1/FPS
+
+
 
 user = getpass.getuser()
 sourcefolder = rf"C:\Users\{user}\Mahou no Ongaku"
@@ -126,7 +129,16 @@ def check_key_and_return(player_state):
 #def control_player():
   #  givencommand = check_key_and_return()
 
-         
+#TODO Ainda preciso fazer um tick mais preciso que esse
+
+def realtick(initial_time):
+    final_time = initial_time + FRAME_TIME
+    current_time = time.monotonic()
+    remaining = final_time - current_time
+
+    if remaining > 0:
+        time.sleep(remaining)
+        
 
 def tick():
     time.sleep(1 / FPS)
@@ -139,9 +151,13 @@ def update():
 
 
 while program_is_running:
+    thistime = time.monotonic()
     update()
-    tick()
+    realtick(thistime)
 
 
 
-   
+
+    
+
+

@@ -4,9 +4,9 @@ import getpass
 import pygame
 from pygame.mixer import music as pymusic
 import keyboard_receiver as controller
-from file_handler import turn_path_into_list, return_or_show_musiclist, get_song_full_path
-from state_handler import set_state_inmenu, set_state_playing, set_state_paused, check_state
-from player_actions import pause_song, play_song, stop_song, unpause_song
+import file_handler as fH
+import state_handler as stateH 
+import player_actions as music_Control
 from difflib import get_close_matches as fuzzymatch
 import short_math as mycalc
 import fuzzy_matcher
@@ -23,95 +23,43 @@ pygame.mixer.init()
 
 player_state = {
 
-    "mode" : "menu" #pode ser ""playing", "paused", "menu"
-    
-}
+    "mode" : "welcomescreen", #pode ser "playing", "paused", "menu", "stopped", "welcomescreen"
+    "welcome_was_shown" : False
 
+}
 
 # IMPORT + VARIÁVEIS INICIAIS + PYGAME INIT
 
+def welcome_screen():
+    if not player_state["welcome_was_shown"]:
+        print("WELCOME to Mahou no Ongaku, the True Music Player!")
+        print("Press [ANY KEY] to continue!")
 
-def get_wanted_song_index(string_input):
-        try:
-            integer_input = (int(string_input) - 1)
-            return integer_input
-        except ValueError:
-            return None
-        
-def get_chosen_song(chosenlist):
-    string_input = input("Choose song number:\n>")
-    index = get_wanted_song_index(string_input)
-    if index is not None:
-        return index
-    
-    string_input
+        player_state["welcome_was_shown"] = True
+
+    anykey = controller.anykey_detector()
+    if anykey:
+        stateH.set_state_menu(player_state)
+        player_state["welcome_was_shown"] = False
 
 
-
-
-    
-#Retorna um index de música
-
-
-
-def quit():
+def quit_program():
+    global program_is_running
     program_is_running = False
     return
 
-def menu():
-    global program_is_running
-    while True:
-        wannacontinue = input("What do you wanna do now?\nP = PLAY ANOTHER SONG\nL = LEAVE\n>")
-        if wannacontinue.lower() == "l":
-            quit()
-        elif wannacontinue.lower() == "p":
-            return_or_show_musiclist(sourcefolder)
-            return
-        else:
-            continue  
-
-def in_song_mode():
-    ...
-
-def counter(seconds):
-    currenttime = time.monotonic()
-    targettime = time.monotonic() + seconds
-    
-
-
-def deal_with_song_status():
-    is_it_busy = pymusic.get_busy()
-    check_key = check_key_and_return(player_state)
-    state = check_state(player_state)
-
-    if(state == "playing" and check_key == "pause"): #Spacebar
-       pause_song(player_state)
-    
-    elif(state == "paused" and check_key == "unpause"): #Spacebar
-       unpause_song(player_state) 
-    
-    elif(state in ("playing", "paused") and check_key == "stop"): #Música parando por comando do usuário
-        print("Music Stopped.")
-        stop_song(player_state)
-        menu()
-    
-    elif(state == "playing" and not is_it_busy): #Música parou sozinha
-        print("Song ended!")
-        stop_song(player_state)
-        menu()
-    
-    elif(state == "playing" and is_it_busy):
-        in_song_mode()
-
-
+def stopped():
+    wannacontinue = input("What do you wanna do now?\nP = PLAY ANOTHER SONG\nL = LEAVE\n>")
+    if wannacontinue.lower() == "l":
+        quit_program()
+    elif wannacontinue.lower() == "p":
+        stateH.set_state_menu()
+        return
         
-
-#Checa o status da música e avisa se tiver acabado, também chama o cumpridor de comandos
-
 
 def check_key_and_return(player_state):
     command = controller.command_detector()
-    state = check_state(player_state)
+    state = stateH.check_state(player_state)
    # print(command)
    # SPACEBAR
     if command == " ":
@@ -123,10 +71,103 @@ def check_key_and_return(player_state):
             return("stop")
 
 
-#def control_player():
-  #  givencommand = check_key_and_return()
+def in_song_mode(): #Vai rodar se o state for playing, e estiver tudo bonitinho, sem ninguém pausando nem nada
+    ...
 
-#TODO Ainda preciso fazer um tick mais preciso que esse
+
+
+
+def deal_with_song_status():
+    is_it_busy = pymusic.get_busy()
+    check_key = check_key_and_return(player_state)
+    state = stateH.check_state(player_state)
+
+    if(state == "playing" and check_key == "pause"): #Spacebar
+       music_Control.pause_song(player_state)
+    
+    elif(state == "paused" and check_key == "unpause"): #Spacebar
+       music_Control.unpause_song(player_state) 
+    
+    elif(state in ("playing", "paused") and check_key == "stop"): #Música parando por comando do usuário
+        print("Music Stopped.")
+        music_Control.stop_song(player_state)
+
+    elif(state == "playing" and not is_it_busy): #Música parou sozinha
+        print("Song ended!")
+        music_Control.stop_song(player_state)
+    
+    elif(state == "playing" and is_it_busy):
+        in_song_mode()
+
+
+# LIDAM COM CAMINHO DE MÚSICA 
+
+
+def get_wanted_song_index(string_input):
+        try:
+            integer_input = (int(string_input) - 1)
+            return integer_input
+        except ValueError:
+            return None
+        
+
+def get_closest_matches_list(string_input, chosenlist):
+    string_input = string_input.lower()
+    matcheslist = fuzzy_matcher.get_matches(string_input, chosenlist, number_of_matches=3)
+    return matcheslist
+        
+
+def get_song_path():
+    loaded_music_list = fH.turn_path_into_list(sourcefolder) #pega a pasta e lista as músicas
+    fH.return_or_show_musiclist(loaded_music_list) #mostra a lista inicial
+    songpath = None
+
+    inputted = input("Type song number or name:\n>") #Motor da def: Acha o input do user
+
+    try:
+        wantedindex = int(inputted)
+        wantedsong = loaded_music_list[wantedindex - 1]
+        # print (wantedsong)
+        songpath = os.path.join(sourcefolder, wantedsong)       #Se o input for número, já retorna um caminho pronto
+        # print(songpath)
+        return songpath
+        
+    except ValueError:
+
+        list_that_matches_input = get_closest_matches_list(inputted, loaded_music_list)
+        print("Based in your input, we found the following matches:")
+        fH.return_or_show_musiclist(list_that_matches_input)            #se nao for int, acha as closematches da string
+        secondinputted = input("Type song number or name:\n>")    #e faz uma nova lista, perguntando dnv qual o user quer
+        
+        try:
+            wantedindex = int(secondinputted)
+            wantedsong = list_that_matches_input[wantedindex - 1]
+            print (wantedsong)
+            songpath = os.path.join(sourcefolder, wantedsong)
+            print(songpath)
+            return songpath
+        except Exception as error:
+            print("Couldn't find the chosen song.", error)
+            return None
+        
+def get_path_and_play():
+    songpath = get_song_path()
+
+    if songpath is None:
+        return
+    try:
+        music_Control.play_song(songpath, player_state)
+    except:
+       return
+    
+#Se o caminho for válido, toca a música. Senão, manda uma mensagem de erro
+
+
+
+
+
+
+
 
 def realtick(initial_time):
     final_time = initial_time + FRAME_TIME
@@ -137,54 +178,25 @@ def realtick(initial_time):
         time.sleep(remaining)
         
 
-def tick():
-    time.sleep(1 / FPS)
-    #anda 1 frame
-
-
 def update():
-    deal_with_song_status()
-    #atualiza tudo, chama o verificador
+    state = stateH.check_state(player_state)
+
+    if state == "playing":
+        deal_with_song_status()
+    elif state == "menu":
+        get_path_and_play()
+    elif state == "stopped":
+        stopped()
+    elif state == "welcomescreen":
+        welcome_screen()
+#atualiza tudo, decide oq cada estado faz
 
 
-""" 
-
-def show_list_and_play(chosenlist, folder):
-    return_or_show_musiclist(chosenlist) #mostra a lista de musica
-
-    chosen_song_index = get_chosen_song(chosenlist)
-    chosen_song_path = get_song_full_path(chosen_song_index, chosenlist, folder)
-
-    if chosen_song_path is not None:
-        play_song(chosen_song_path, player_state)
-        return
-    else:
-        print("Não foi possível encontrar a música")
-        return "error"
-#Faz as quatro funções mais importantes do file_handler em sequência: Mostra a lista de músicas, obtém o caminho da
-#música e manda o Pygame tocar, também verifica se o número que o usuário digitou é válido
- """
-#CORPO DO ARQUIVO:
-
-
-loaded_music_list = turn_path_into_list(sourcefolder) #pega a pasta e lista as músicas
-return_or_show_musiclist(loaded_music_list) #mostra a lista de músicas
-
-chosen_song_index = get_chosen_song(loaded_music_list) #descobre a musica que o user quer ouvir
-chosen_song_path = get_song_full_path(chosen_song_index, loaded_music_list, sourcefolder)#acha o caminho da música desejada
-
-play_song(chosen_song_path, player_state) if chosen_song_path is not None else print("Não foi possível encontrar a música")
-#Se o caminho for válido, toca a música. Senão, manda uma mensagem de erro
-       
 
 while program_is_running:
     thistime = time.monotonic()
     update()
     realtick(thistime)
 
-
-
-
-    
 
 

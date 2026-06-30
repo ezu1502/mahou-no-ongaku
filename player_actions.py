@@ -1,5 +1,5 @@
 import os
-from state_handler import set_state_inmenu, set_state_playing, set_state_paused, check_state
+from state_handler import set_state_menu, set_state_playing, set_state_paused, check_state, set_state_stopped
 import pygame
 from pygame.mixer import music as pymusic
 
@@ -27,4 +27,4 @@ def unpause_song(player_state):
     set_state_playing(player_state)
 def stop_song(player_state):
     pymusic.stop()
-    set_state_inmenu(player_state)
+    set_state_stopped(player_state)

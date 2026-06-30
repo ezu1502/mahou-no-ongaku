@@ -1,29 +1,53 @@
-from rapidfuzz import process, fuzz
-
+from rapidfuzz import fuzz
+import file_handler
 def get_matches (string, chosenlist, number_of_matches = 3):
-    compared_string = string.lower()
-    organized_list = []
-    for indx, name in chosenlist:
-        organized_list.append((indx, name))
+    compared_string = string.lower().strip()
         
-    scores = [
+    list_with_score = []
+    for eachraw in chosenlist:
+        if isinstance(eachraw, str):
+            each = eachraw.lower().strip()
+        elif isinstance(eachraw, tuple):
+            name = eachraw[0]
+            each = name.lower().strip()
+        scores = [
+        
+        fuzz.partial_ratio(compared_string, each),
+        2*fuzz.partial_token_sort_ratio(compared_string, each),
+        fuzz.WRatio(compared_string, each),
+        fuzz.partial_token_set_ratio(compared_string, each),
+        fuzz.ratio(compared_string, each)
+
+        ]
+        
+        finalscore = sum(scores)/6
+        list_with_score.append((eachraw, finalscore))
+
+
+
+    list_with_score.sort(key=lambda item: item[1], reverse=True)
+    list_with_score = list_with_score[:number_of_matches]
     
-    fuzz.partial_ratio(compared_string, chosenlist),
-    2*fuzz.partial_token_sort_ratio(compared_string, chosenlist),
-    fuzz.WRatio(compared_string, chosenlist),
-    fuzz.partial_token_set_ratio(compared_string, chosenlist),
-    fuzz.ratio(compared_string, chosenlist)
+    
+    finallist = []
+    
+    for eachone in list_with_score:
+        finallist.append(eachone[0])
+        
+    # file_handler.return_or_show_musiclist(finallist)
 
-    ]
 
-    finalscore = sum(scores)/len(scores) + 1
-    otherlist = []
-    for indx, name in chosenlist:
-        otherlist.append(indx, name, finalscore)
 
-    otherlist.sort(key=lambda item: item[2], reverse=True)
-    otherlist = otherlist[:5]
-
-    return otherlist
+    return finallist
     
     #TODO CHECAR! NAO TERMINADO!
+
+
+# for eachfile in files:
+#         if eachfile.lower().endswith(".mp3"):
+#             # eachfile_name = eachfile.replace("\ufeff", "")
+#             music_files_list.append(eachfile)  
+
+#     music_files_list.sort(key=lambda name: name.strip().lower())
+#     return music_files_list
+

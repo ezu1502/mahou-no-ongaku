@@ -9,3 +9,8 @@ def command_detector():
     key = keyboard.getch().decode().lower()
     #print(key)
     return key
+
+def anykey_detector():
+    if keyboard.kbhit():
+        return True
+    return False

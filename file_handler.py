@@ -11,8 +11,10 @@ def turn_path_into_list(folder):
 
     for eachfile in files:
         if eachfile.lower().endswith(".mp3"):
+            # eachfile_name = eachfile.replace("\ufeff", "")
             music_files_list.append(eachfile)  
-    music_files_list.sort(key=lambda name: name.lstrip("\ufeff").strip().lower())
+
+    music_files_list.sort(key=lambda name: name.strip().lower())
     return music_files_list
 #load_music_list() transforma a pasta escolhida em uma lista, eliminando os arquivos que não são .mp3
 
@@ -31,12 +33,12 @@ def get_song_full_path(musicnumber, loadedmusiclist, folder):
 #Retorna o caminho da música baseado no numero que receber
 
 def return_or_show_musiclist(chosenlist, returnmode=False):
-    
     if not returnmode:
     
         for indx, musicname in enumerate(chosenlist):
 
-            index_and_name = (indx + 1, " ", (musicname))
+            index_and_name = f"{indx + 1} - {musicname}"
+            index_and_name = index_and_name.replace("\ufeff", "")
 
             print(index_and_name)
         return None
@@ -46,13 +48,5 @@ def return_or_show_musiclist(chosenlist, returnmode=False):
     for indx, musicname in enumerate(chosenlist):
         fullname = (indx + 1, musicname)
         index_and_name_list.append(fullname)
-
-
-
-
-
-
-
-
-# Mostra a lista com index e 
+    return index_and_name_list
 

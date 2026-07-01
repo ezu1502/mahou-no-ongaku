@@ -24,7 +24,7 @@ pygame.mixer.init()
 player = MusicPlayer()
 window = MahouWindow(player, WINDOW_DIMENSIONS)
 
-window.run()
+# window.run()
 # IMPORT + VARIÁVEIS INICIAIS + PYGAME INIT
 
 def welcome_screen():
@@ -132,6 +132,8 @@ def deal_with_song_status():
         paused_mode()
     elif(state == "stopped"):
         stopped()
+    elif(state == "shut_down"):
+        quit_program()
 
 
 # LIDAM COM CAMINHO DE MÚSICA 
@@ -233,6 +235,7 @@ def update():
 
 while program_is_running:
     thistime = time.monotonic()
+    window.root.update()
     update()
     realtick(thistime)
 

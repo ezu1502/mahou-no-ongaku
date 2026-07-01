@@ -21,6 +21,10 @@ class MusicPlayer:
         pymusic.stop()
         self.mode = "menu"
 
+    def set_state_killed(self):
+        pymusic.stop()
+        self.mode = "shut_down"
+        
     def set_state_welcomescreen(self):
         self.mode = "welcomescreen"
 
@@ -58,6 +62,11 @@ class MusicPlayer:
         if self.mode == "playing" or self.mode == "paused":
             pymusic.stop()
             self.set_state_stopped()
+
+    def shut_program_down(self):
+        if self.mode != "shut_down":
+            pymusic.stop()
+            self.set_state_killed()
 
     def check_welcome_was_shown(self):
         return self.welcome_was_shown

@@ -1,5 +1,5 @@
 import tkinter as tk
-
+import os
 class MahouWindow:
 
     def __init__(self, player, dimensions = "600x600"):
@@ -10,14 +10,16 @@ class MahouWindow:
         self.root.geometry(dimensions)
         self.root.resizable(False, False)
 
+        self.root.protocol("WM_DELETE_WINDOW", self.Xpressed)
+
         self.title_label = tk.Label(self.root, text = "Mahou no Ongaku")
         self.title_label.pack(pady = 20)
 
         self.status_label = tk.Label(self.root, text = "Status: Ready")
         self.status_label.pack(pady = 10)
         
-        self.testpath = r"C:\Users\dudul\Mahou no Ongaku\0 - ﻿Ado.mp3"
-        self.test_button = tk.Button(self.root, text = "Text Button", command=lambda: self.player.play_song(self.testpath))
+    
+        self.test_button = tk.Button(self.root, text = "Text Button", command = self.test_button_pressed)
         self.test_button.pack(pady = 30) 
 
     def test_button_pressed(self):
@@ -25,6 +27,10 @@ class MahouWindow:
     def run(self):
         self.root.mainloop()
 
+    def Xpressed(self):
+        self.player.shut_program_down()
+        self.root.destroy()
+        os._exit(0)
 
 
 

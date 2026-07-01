@@ -18,6 +18,7 @@ class MusicPlayer:
         self.mode = "stopped"
 
     def set_state_menu(self):
+        pymusic.stop()
         self.mode = "menu"
 
     def set_state_welcomescreen(self):

@@ -9,10 +9,12 @@ from difflib import get_close_matches as fuzzymatch
 import toolkit.calc as mycalc
 import toolkit.fuzzy_matcher as fuzzy_matcher
 from music_player_class import MusicPlayer
+from window_class import MahouWindow
 program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS
 
+WINDOW_DIMENSIONS = "900x600"
 user = getpass.getuser()
 sourcefolder = rf"C:\Users\{user}\Mahou no Ongaku"
 #define a pasta a ser usada e descobre o nome do usuário ativo
@@ -20,8 +22,9 @@ sourcefolder = rf"C:\Users\{user}\Mahou no Ongaku"
 pygame.mixer.init()
 
 player = MusicPlayer()
+window = MahouWindow(player, WINDOW_DIMENSIONS)
 
-
+window.run()
 # IMPORT + VARIÁVEIS INICIAIS + PYGAME INIT
 
 def welcome_screen():
@@ -77,6 +80,12 @@ def in_song_mode(): #Vai rodar se o state for playing, e estiver tudo bonitinho,
     check_key = get_command_from_key()
     if check_key == "toggle":
         player.pause_song()
+        player.paused_was_shown = False
+    elif check_key == "stop":
+        player.stop_song()
+        player.paused_was_shown = False
+    elif check_key == "menu":
+        player.set_state_menu()
         player.paused_was_shown = False
     
 

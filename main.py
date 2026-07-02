@@ -9,21 +9,27 @@ from difflib import get_close_matches as fuzzymatch
 import toolkit.calc as mycalc
 import toolkit.fuzzy_matcher as fuzzy_matcher
 from music_player_class import MusicPlayer
-from window_classes import MahouWindow, MahouButton
+from window_folder import MahouWindow, MahouButton
 
 program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS
 
 WINDOW_DIMENSIONS = "900x600"
-user = getpass.getuser()
-sourcefolder = rf"C:\Users\{user}\Mahou no Ongaku"
-#define a pasta a ser usada e descobre o nome do usuário ativo
 
 pygame.mixer.init()
 
 player = MusicPlayer()
 window = MahouWindow(player, WINDOW_DIMENSIONS)
+
+
+user = getpass.getuser()
+player.set_sourcefolder(rf"C:\Users\dudul\Mahou no Ongaku")
+
+# sourcefolder = player.sourcefolder
+
+#define a pasta a ser usada e descobre o nome do usuário ativo
+
 
 # window.run()
 # IMPORT + VARIÁVEIS INICIAIS + PYGAME INIT
@@ -39,6 +45,7 @@ def welcome_screen():
         player.set_state_menu()
         player.welcome_was_shown = False
         avoidbug = controller.anykey_detector()
+
 
 
 def quit_program():
@@ -133,8 +140,7 @@ def deal_with_song_status():
         paused_mode()
     elif(state == "stopped"):
         stopped()
-    elif(state == "shut_down"):
-        quit_program()
+    
 
 
 # LIDAM COM CAMINHO DE MÚSICA 
@@ -155,8 +161,9 @@ def get_closest_matches_list(string_input, chosenlist):
         
 
 def get_song_path():
-    loaded_music_list = fH.turn_path_into_list(sourcefolder) #pega a pasta e lista as músicas
+    loaded_music_list = fH.turn_path_into_list(player.sourcefolder) #pega a pasta e lista as músicas
     fH.return_or_show_musiclist(loaded_music_list) #mostra a lista inicial
+    window.set_music_list(loaded_music_list)
     songpath = None
 
     inputted = input("Type song number or name:\n>") #Motor da def: Acha o input do user
@@ -165,7 +172,7 @@ def get_song_path():
         wantedindex = int(inputted)
         wantedsong = loaded_music_list[wantedindex - 1]
         # print (wantedsong)
-        songpath = os.path.join(sourcefolder, wantedsong)       #Se o input for número, já retorna um caminho pronto
+        songpath = os.path.join(player.sourcefolder, wantedsong)       #Se o input for número, já retorna um caminho pronto
         # print(songpath)
         return songpath
         
@@ -180,7 +187,7 @@ def get_song_path():
             wantedindex = int(secondinputted)
             wantedsong = list_that_matches_input[wantedindex - 1]
             print (wantedsong)
-            songpath = os.path.join(sourcefolder, wantedsong)
+            songpath = os.path.join(player.sourcefolder, wantedsong)
             print(songpath)
             return songpath
         except Exception as error:
@@ -204,7 +211,10 @@ def get_path_and_play():
 #Se o caminho for válido, toca a música. Senão, manda uma mensagem de erro
 
 
-
+def menu_test():
+    loaded_music_list = fH.turn_path_into_list(player.sourcefolder) #pega a pasta e lista as músicas
+    # fH.return_or_show_musiclist(loaded_music_list) #mostra a lista inicial
+    window.set_music_list(loaded_music_list)
 
 
 
@@ -225,14 +235,20 @@ def update():
     if state == "playing" or state == "paused":
         deal_with_song_status()
     elif state == "menu":
-        get_path_and_play()
+        # get_path_and_play()
+        # menu_test()
+        ...
     elif state == "stopped":
         stopped()
     elif state == "welcomescreen":
         welcome_screen()
+    elif state == "shut_down":
+        quit_program()
 #atualiza tudo, decide oq cada estado faz
 
 
+loaded_music_list = fH.turn_path_into_list(player.sourcefolder) 
+window.set_music_list(loaded_music_list, player.sourcefolder)
 
 while program_is_running:
     thistime = time.monotonic()

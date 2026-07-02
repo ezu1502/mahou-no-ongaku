@@ -1,12 +1,20 @@
 from pygame.mixer import music as pymusic
 import os
+import getpass 
+import file_handler as Fhandler
 
 class MusicPlayer:
-
+# CONFIGURAÇÕES PADRÃO NO INIT
     def __init__(self):
-        self.mode = "welcomescreen" #pode ser "playing", "paused", "menu", "stopped", "welcomescreen"
+        self.mode = "menu" #pode ser "playing", "paused", "menu", "stopped", "welcomescreen"
         self.welcome_was_shown = False
         self.paused_was_shown = False
+
+        user = getpass.getuser()
+        self.sourcefolder = rf"C:\Users\{user}\Mahou no Ongaku"
+
+
+#NOVO STATE_HANDLER
 
     def set_state_playing(self):
         self.mode = "playing"
@@ -31,9 +39,10 @@ class MusicPlayer:
     def check_state(self):
         return self.mode
 
-
+#CONTROLES DA MÚSICA
 
     def play_song(self, path):
+        self.paused_was_shown = False
         if self.mode != "playing":
             if path is None:
                 print("Número inválido:")
@@ -55,6 +64,7 @@ class MusicPlayer:
             self.set_state_paused()
 
     def unpause_song(self):
+        self.paused_was_shown = False
         if self.mode == "paused":
             pymusic.unpause()
             print("Playing!")
@@ -75,7 +85,16 @@ class MusicPlayer:
     def check_pause_was_shown(self):
         return self.pause_was_shown
 
+#CONTROLES DA SOURCEFOLDER
 
+    def set_sourcefolder(self, path):
+        self.sourcefolder = path
+        self.get_music_list(path)
+
+    def get_music_list(self, folder): #folder no caso é o mesmo que o path
+        self.song_list = Fhandler.turn_path_into_list(folder)
+
+    
 
 
 

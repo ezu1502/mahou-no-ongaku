@@ -6,31 +6,75 @@ from tkinter import filedialog as explorer
 from ENUMS import PS, COLORS, painted_string
 from tkinter import ttk
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("MahouWindow")
 
 class MahouWindow:
     def __init__(self, player, dimensions = "900x600"):
 
         self.define_window(dimensions) #WINDOW DEFINITIONS
-
         self.mahou_player = player
         self.mahou_player.window_set_state = self.set_state
         self.mahou_player.window_get_state = self.get_state
 
         log.debug("Player obj. received in window") #RECEIVING PLAYER
 
-        self.create_init_lists() #WINDOW LISTS AND FOLDER CREATION
+    # ------------- USEFUL VARIABLES
+        self.display_list = []
+        self.path_list = []
+
+        self.playing_label_exists = False
+        self.new_loaded_song = False
+
+        self.selection_path: Path | None = None
+        self.selected_index: int | None = None
+
+        self.default_folder = Path.home() / "Mahou no Ongaku"
+        log.debug("Window init lists and folder created")
+
+    # ------------------------------------------------------------------
 
         self.state = PS.IN_MENU #DEFAULT STATE SET
- 
         self.make_main_screen() #DEFINING BUTTONS AND LISTBOX
 
-        self.set_folder_and_lists(self.default_folder) #DEFAULT_FOLDER SET
+        if self.default_folder.exists():
+            self.set_folder_and_lists(self.default_folder) #DEFAULT_FOLDER SET
 
 
 
+#region ------------------ #00 - DEFINING WINDOW
 
-# ------------------------ #01 - PLAYER CONTROLS
+    def centralize(self, dimensions: str) -> str:
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        root_width, root_height = dimensions.split("x")
+        root_width, root_height = int(root_width), int(root_height)
+
+        x = (screen_width//2) - (root_width//2)
+        y = (screen_height//2) - (root_height//2)
+        position_and_dimensions = f"{dimensions}+{x}+{y}"
+        return position_and_dimensions
+    
+    def x_button_was_pressed(self):
+        self.root.destroy()
+        log.info("Window destroyed")
+        self.set_state(PS.SHUT_DOWN)
+
+    def define_window(self, dimensions):
+        self.root = tk.Tk()
+        self.root.title("MAHOU NO ONGAKU")
+        
+        positioning = self.centralize(dimensions)
+        self.root.geometry(positioning)
+
+        self.root.resizable(False, False) #centraliza e escolhe o tamanho dela
+        self.root.config(bg = "#111111")
+
+        self.root.protocol("WM_DELETE_WINDOW", self.x_button_was_pressed)
+
+        log.debug("Window created")
+
+#endregion
+#region ------------------ #01 - PLAYER CONTROLS
 
     def play_song_by_index(self, index: int):
         current_path: Path = self.path_list[index]
@@ -39,67 +83,11 @@ class MahouWindow:
         self.playing_song_name = current_path.stem
         self.mahou_player.load_song(current_path)
         self.mahou_player.play_song()
+        self.set_state(PS.PLAYING)
         self.show_playing_label(self.playing_song_name)
 
-    def play_song(self, modifier: int = 0):
-        if self.selection_path is None:
-            log.warning("No song was selected!")
-            return
-        
-        self.mahou_player.load_song(self.selection_path)
-        self.mahou_player.play_song()
-
-        self.playing_song_index: int | None = (self.selected_index + modifier)
-        # self.selected_index = None
-
-        if(self.playing_song_index is not None):
-            self.playing_song_name = self.path_list[self.playing_song_index].stem
-        else:
-            log.warning("from play_song(self): self.playing_song_index is None!")
-
-        self.show_playing_label(self.playing_song_name)
-        # self.selection_path = None
-
-    def play_previous_song(self):
-        if self.playing_song_index is not None:
-            previous_song_index: int = (self.playing_song_index - 1)
-
-        previous_song_path = self.path_list[previous_song_index]
-        self.mahou_player.load_song(previous_song_path)
-        self.mahou_player.play_song()
-
-        self.playing_song_index = previous_song_index
-
-        if(self.playing_song_index is not None):
-            self.playing_song_name = self.path_list[self.playing_song_index].stem
-        else:
-            log.warning("from play_previous_song(self): self.playing_song_index is None!")
-
-        self.selected_index = 0
-        self.selection_path = None
-
-        self.show_playing_label(self.playing_song_name)
-
-    def play_next_song(self):
-        if self.playing_song_index is not None:
-            next_song_index: int = (self.playing_song_index + 1)
-
-        next_song_path = self.path_list[next_song_index]
-        self.mahou_player.load_song(next_song_path)
-        self.mahou_player.play_song()
-
-        self.playing_song_index = next_song_index
-
-        if(self.playing_song_index is not None):
-            self.playing_song_name = self.path_list[self.playing_song_index].stem
-        else:
-            log.warning("from play_next_song(self): self.playing_song_index is None!")
-
-        self.selected_index = 0
-        self.selection_path = None
-
-        self.show_playing_label(self.playing_song_name)
-        
+    def play_without_load(self):
+        self.mahou_player.play_without_load()
 
     def pause_song(self) -> None:
         self.mahou_player.pause_song()
@@ -107,8 +95,10 @@ class MahouWindow:
     def stop_song(self) -> None:
         self.mahou_player.stop_song()
 
-    def load_song(self) -> None:
-        self.mahou_player.load_song()
+    def load_song_index(self, index) -> None:
+        path_to_load: Path = self.path_list[index]
+        self.mahou_player.load_song(path_to_load)
+        self.playing_song_index = index
 
     def unpause_song(self) -> None:
         self.mahou_player.unpause_song()
@@ -116,71 +106,77 @@ class MahouWindow:
     def toggle(self):
         match self.state:
             case PS.IN_MENU:
-                self.play_song_by_index(self.selected_index)
+                if self.selected_index is not None:
+                    self.play_song_by_index(self.selected_index)
             case PS.PLAYING:
                 self.pause_song()
             case PS.PAUSED:
-                self.unpause_song()
+                if not self.new_loaded_song:
+                    self.unpause_song() 
+                else:
+                    if self.selected_index is not None:
+                        self.play_song_by_index(self.selected_index)
+                    self.new_loaded_song = False
+            case PS.STOPPED:
+                self.play_without_load()
+            case _:
+                self.play_without_load()
 
 
     def goto_previous_song(self):
-        log.debug("'Previous' button pressed")
-
-        current_song_index = self.playing_song_index if self.playing_song_index is not None else 0
-
-        match self.state:
-            case PS.PLAYING:
-                self.stop_song()
-                self.play_song_by_index(current_song_index - 1)
-            case PS.PAUSED:
-                self.stop_song()
-                self.load_song()
-
-
-    def goto_next_song(self):
-        log.debug("'Next' button pressed")
-        if self.playing_song_index is None:
-            log.warning("self.playing_song_index is None!")
+        if self.selected_index is None:
             return
         
+        log.debug("'Previous' button pressed")
 
-        next_song_index = self.playing_song_index + 1
-        self.selection_path = self.path_list[next_song_index]
-        next_selection = self.playing_song_index + 1
-
-        self.music_listbox.selection_clear(self.playing_song_index)
-        self.music_listbox.select_set(next_selection)
+        
+        self.selected_index -= 1
 
         match self.state:
             case PS.PLAYING:
                 self.stop_song()
-                self.play_next_song()
+                self.play_song_by_index(self.selected_index)
             case PS.PAUSED:
                 self.stop_song()
-                self.load_song()
+                self.new_loaded_song = True
+        self.listbox_select(self.selected_index)
 
+    def goto_next_song(self):
+        if self.selected_index is None:
+            return
+        log.debug("'Previous' button pressed")
+    
+        self.selected_index += 1
 
+        match self.state:
+            case PS.PLAYING:
+                self.stop_song()
+                self.play_song_by_index(self.selected_index)
+            case PS.PAUSED:
+                self.stop_song()
+                self.new_loaded_song = True
+        self.listbox_select(self.selected_index)
+
+    
     def restart_song(self):
         log.debug("Restart Button pressed")
 
         if self.state == PS.PLAYING:
             self.stop_song()
-            self.play_song()
-
+            self.play_song_by_index(self.playing_song_index)
             log.debug("Restarted song successfully")
+
         elif self.state == PS.PAUSED:
             self.stop_song()
-            self.load_song()
+            self.load_song_index(self.playing_song_index)
 
             log.debug("Restarted song successfully")
         else:
             log.warning("No song to restart, dummy!")
 
-        
+#endregion
 
-        
-
-# ------------------------ #02 - STATE MANAGER
+#region ------------------ #02 - STATE MANAGER
 
     def set_state(self, state: PS) -> None:
         self.state = state
@@ -193,12 +189,15 @@ class MahouWindow:
             case PS.PLAYING:
                 self.play_button.config(text = "PAUSE")
             case PS.PAUSED:
-                self.play_button.config(text = "▶ PLAY")    
+                self.play_button.config(text = "▶ PLAY")   
+        log.debug("UI updated by state")
 
     def get_state(self) -> PS:
         return self.state
 
-# ------------------------ #03 - LISTS AND FOLDERS
+#endregion
+
+#region ------------------ #03 - LISTS AND FOLDERS
 
     def get_folder_path(self):
         folder_str = explorer.askdirectory()
@@ -252,51 +251,10 @@ class MahouWindow:
 
         # print(selection_name)
 
-
-# ------------------------ #04 - WINDOW DEFINING
-
-    def centralize(self, dimensions: str) -> str:
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        root_width, root_height = dimensions.split("x")
-        root_width, root_height = int(root_width), int(root_height)
-
-        x = (screen_width//2) - (root_width//2)
-        y = (screen_height//2) - (root_height//2)
-        position_and_dimensions = f"{dimensions}+{x}+{y}"
-        return position_and_dimensions
-    
-    def x_button_was_pressed(self):
-        self.root.destroy()
-        log.info("Window destroyed")
-        self.set_state(PS.SHUT_DOWN)
-
-    def define_window(self, dimensions):
-        self.root = tk.Tk()
-        self.root.title("MAHOU NO ONGAKU")
-        
-        positioning = self.centralize(dimensions)
-        self.root.geometry(positioning)
-
-        self.root.resizable(False, False) #centraliza e escolhe o tamanho dela
-        self.root.config(bg = "#111111")
-
-        self.root.protocol("WM_DELETE_WINDOW", self.x_button_was_pressed)
-
-        log.debug("Window created")
-
-    def create_init_lists(self):
-        self.display_list = []
-        self.path_list = []
-
-        self.selection_path: Path | None = None
-        self.selected_index: int = 0
-
-        self.default_folder = Path.home() / "Mahou no Ongaku"
-        log.debug("Window init lists and folder created")
+#endregion
 
 
-# ----------------------- #05 - SCREEN FACTORY
+#region ------------------ #05 - SCREEN FACTORY
 
     def make_main_screen(self):
         self.main_screen_frame = tk.Frame(self.root, bg = "#111111")
@@ -312,7 +270,7 @@ class MahouWindow:
         self.play_button = self.make_mahou_button(
             self.main_screen_frame,
             "▶ PLAY",
-            command = lambda: self.play_song_by_index(self.selected_index)
+            command = self.toggle
             )
         
         self.play_button.pack(pady = 10)
@@ -336,16 +294,28 @@ class MahouWindow:
 
         log.debug("Main screen created")
 
-
-# - - - - - - - - - - - - - #06 SCREEN RESOURCES FACTORY
+#endregion
+#region ------------------ #06 SCREEN RESOURCES FACTORY
 
     def show_playing_label(self, songname):
-        self.playing_label = self.make_mahou_label(self.main_screen_frame, f"Now Playing: {songname}")
-        self.playing_label.pack()
-        log.debug("playing label shown")
+        if not self.playing_label_exists:
+            self.playing_label = self.make_mahou_label(self.main_screen_frame, f"Now Playing: {songname}")
+            self.playing_label.pack()
+            log.debug("playing label created and shown")
 
+            self.playing_label_exists = True
+        else:
+            self.playing_label.config(text = f"Now Playing: {songname}")
+            log.debug("playing label changed")
 
-# ----------------------- #07 WIDGET FACTORY
+    def listbox_select(self, index):
+        self.music_listbox.select_clear(0, tk.END)
+        self.music_listbox.select_set(index)
+
+        
+#endregion
+
+#region ----------------------- #07 WIDGET FACTORY
 
     def make_mahou_label(self, parent, wanted_text: str, **settings):
         default_settings = {
@@ -412,7 +382,8 @@ class MahouWindow:
 
         return ttk.Scrollbar(parent, orient = "vertical", style = "Purple.Vertical.TScrollbar")
         
-        
+
+#endregion
     
 
         

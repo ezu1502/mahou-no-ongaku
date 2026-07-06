@@ -4,7 +4,7 @@ import logging
 from functools import wraps
 from ENUMS import PS, COLORS, painted_string
 
-from window import MahouWindow
+from new_window import MahouWindow
 from player import MahouPlayer
 
 logging.basicConfig(

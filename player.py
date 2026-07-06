@@ -73,4 +73,8 @@ class MahouPlayer:
 
     def stop_song(self) -> None:
         Pymusic.stop()
-        # self.set_state(PS.STOPPED)
+        self.set_state(PS.IN_MENU)
+
+    def play_without_load(self):
+        Pymusic.play()
+        self.set_state(PS.PLAYING)

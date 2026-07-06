@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from tkinter import filedialog as explorer
 from ENUMS import PS, COLORS, painted_string
-
+from tkinter import ttk
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class MahouWindow:
 
 
 
-# ------------------------ PLAYER CONTROLS
+# ------------------------ #01 - PLAYER CONTROLS
 
     def play_song(self):
         if self.selection_path is None:
@@ -38,6 +38,8 @@ class MahouWindow:
             return
         
         self.mahou_player.play_song(self.selection_path)
+
+        self.show_playing_label()
         self.selection_path = None
 
     def pause_song(self) -> None:
@@ -56,7 +58,7 @@ class MahouWindow:
             case PS.PAUSED:
                 self.unpause_song()    
 
-# ------------------------ STATE MANAGER
+# ------------------------ #02 - STATE MANAGER
 
     def set_state(self, state: PS) -> None:
         self.state = state
@@ -74,7 +76,7 @@ class MahouWindow:
     def get_state(self) -> PS:
         return self.state
 
-# ------------------------ LISTS AND FOLDERS
+# ------------------------ #03 - LISTS AND FOLDERS
 
     def get_folder_path(self):
         folder_str = explorer.askdirectory()
@@ -119,14 +121,15 @@ class MahouWindow:
         selection_index = selection[0]
         selection_name = self.music_listbox.get(selection_index)
 
-        self.selection_path = self.path_list[selection_index]
+        self.selection_path = Path(self.path_list[selection_index])
+        self.selected_song = self.selection_path.stem
 
         # print(self.selection_path)
 
         # print(selection_name)
 
 
-# ------------------------ WINDOW DEFINING
+# ------------------------ #04 - WINDOW DEFINING
 
     def centralize(self, dimensions: str) -> str:
         screen_width = self.root.winfo_screenwidth()
@@ -168,13 +171,14 @@ class MahouWindow:
         log.debug("Window init lists and folder created")
 
 
-# ----------------------- SCREEN FACTORY
+# ----------------------- #05 - SCREEN FACTORY
+
     def make_main_screen(self):
-        self.title = self.make_mahou_label("Mahou no Ongaku", font = ("Banschrift", 20))
+        self.title = self.make_mahou_label("Mahou no Ongaku", font = ("Banschrift", 30))
         self.title.pack(pady = 20)
 
         self.music_listbox = self.make_mahou_listbox()
-        self.music_listbox.pack(pady = (0, 20))
+        self.music_listbox.pack(padx = 20, pady = (0, 20), side = "left", fill = "both")
         self.music_listbox.bind("<<ListboxSelect>>", self.get_selection_from_listbox)
         
         self.play_button = self.make_mahou_button("▶ PLAY", command = self.toggle)
@@ -183,9 +187,23 @@ class MahouWindow:
         self.folder_button = self.make_mahou_button("Choose folder", command = self.get_folder_path)
         self.folder_button.pack()
 
+        self.scrollbar = self.make_mahou_scrollbar()
+        self.scrollbar.pack(side = "right", fill = "y")
+        self.music_listbox.config(yscrollcommand = self.scrollbar.set) #Pra scrollbar funcionar
+        self.scrollbar.config(command = self.music_listbox.yview)
+
+        log.debug("Main screen created")
 
 
-# ----------------------- WIDGET FACTORY
+# - - - - - - - - - - - - - #06 SCREEN RESOURCES FACTORY
+
+    def show_playing_label(self):
+        self.playing_label = self.make_mahou_label(f"Now Playing: {self.selected_song}")
+        self.playing_label.pack()
+        log.debug("playing label shown")
+
+
+# ----------------------- #07 WIDGET FACTORY
 
     def make_mahou_label(self, wanted_text: str, **settings):
         default_settings = {
@@ -225,7 +243,7 @@ class MahouWindow:
             "fg": "#ffffff",
             "selectbackground": "#616161",
             "selectforeground": "#ffffff",
-            "width": 70,
+            "width": 50,
             "height": 14,
             "highlightthickness": 0,
             "borderwidth": 0,
@@ -236,3 +254,23 @@ class MahouWindow:
         chosen_config.update(listbox_config)
 
         return tk.Listbox(self.root, **chosen_config)
+    
+    def make_mahou_scrollbar(self):
+        style = ttk.Style()
+        style.theme_use("clam")
+
+        style.configure(
+            "Purple.Vertical.TScrollbar",
+            background = "#7b2cbf",
+            troughcolor = "#1a1a1a",
+            bordercolor = "#1a1a1a",
+            arrowcolor = "#ffffff",
+            relief = "flat"
+        )
+
+        return ttk.Scrollbar(self.root, orient = "vertical", style = "Purple.Vertical.TScrollbar")
+        
+        
+    
+
+        

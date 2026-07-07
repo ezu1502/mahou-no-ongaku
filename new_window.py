@@ -137,8 +137,12 @@ class MahouWindow:
         
         log.debug("'Previous' button pressed")
 
-        
-        self.selected_index -= 1
+        folder_length: int = len(self.path_list)
+        print(self.selected_index)
+        if self.selected_index <= 0:
+            self.selected_index = (folder_length - 1)
+        else:
+            self.selected_index -= 1
 
         match self.state:
             case PS.PLAYING:
@@ -153,8 +157,12 @@ class MahouWindow:
         if self.selected_index is None:
             return
         log.debug("'Previous' button pressed")
-    
-        self.selected_index += 1
+
+        folder_length: int = len(self.path_list)
+        if self.selected_index >= (folder_length - 1):
+            self.selected_index = 0
+        else:
+            self.selected_index += 1
 
         match self.state:
             case PS.PLAYING:
@@ -283,8 +291,8 @@ class MahouWindow:
         self.folder_button = self.make_mahou_button(self.main_screen_frame, "Choose folder", command = self.get_folder_path)
         self.folder_button.pack()
 
-        self.previous_song_button = self.make_mahou_button(self.main_screen_frame, "Restart song", command = self.restart_song)
-        self.previous_song_button.pack(pady = (10,0), padx = 10)
+        self.restart_song_button = self.make_mahou_button(self.main_screen_frame, "Restart song", command = self.restart_song)
+        self.restart_song_button.pack(pady = (10,0), padx = 10)
         
         self.previous_song_button = self.make_mahou_button(self.main_screen_frame, "Previous", command = self.goto_previous_song)
         self.previous_song_button.pack(pady = (10,0), padx = 10)

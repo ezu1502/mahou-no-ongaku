@@ -73,6 +73,14 @@ class MahouWindow:
 
         log.debug("Window created")
 
+    def start_ui_loop(self):
+        self.update_dynamic_UI()
+        self.root.after(16, self.start_ui_loop)
+
+    def update_dynamic_UI(self):
+        #waveform, progress bar, animações, etc
+        pass
+
 #endregion
 #region ------------------ #01 - PLAYER CONTROLS
 
@@ -242,13 +250,10 @@ class MahouWindow:
         selection_index = selection[0]
         self.selected_index = selection_index   
 
-        selection_name = self.music_listbox.get(selection_index)
-
         self.selection_path = Path(self.path_list[selection_index])
         self.selected_song = self.selection_path.stem
             
         # print(self.selection_path)
-
         # print(selection_name)
 
 #endregion

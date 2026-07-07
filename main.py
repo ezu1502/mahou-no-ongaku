@@ -17,9 +17,10 @@ program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS
 
-mahou_player = MahouPlayer()
-mahou_window = MahouWindow(mahou_player, dimensions = "900x600")
 
+
+
+""" 
 def tick(function):
     log.debug("tick decorator created")
 
@@ -45,10 +46,20 @@ def tick(function):
 
 
 def update():
+
     if mahou_window.state == PS.SHUT_DOWN:
         shut_down()
         return
     mahou_window.root.update()
+
+@tick
+def mainloop():
+    update()
+
+    
+while program_is_running:
+    mainloop() #tá com o tick decorator, então toda vez roda automaticamente forçando 60FPS
+
 
 def shut_down():
     global program_is_running
@@ -56,11 +67,16 @@ def shut_down():
 
     log.info("Program Terminated")
 
-@tick
-def mainloop():
-    update()
+ """
 
-while program_is_running:
-    mainloop() #tá com o tick decorator, então toda vez roda automaticamente forçando 60FPS
+
+
+mahou_player = MahouPlayer()
+mahou_window = MahouWindow(mahou_player, dimensions = "900x600")
+
+
+mahou_window.root.mainloop()
+
+
 
 print()

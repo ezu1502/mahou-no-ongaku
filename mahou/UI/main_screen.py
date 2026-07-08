@@ -1,0 +1,156 @@
+import tkinter as tk
+from tkinter import ttk
+import logging
+from mahou.colors import painted_string
+from pathlib import Path
+
+log = logging.getLogger(painted_string("main_screen", "#2424F7"))
+
+class MainScreen(tk.Frame):
+
+    def __init__(self, root, sith_lord):
+        super().__init__(root, bg = "#111111")
+
+        self.root = root
+        self.pack(fill = "both", expand = True)
+
+        #region WIDGETS
+
+        self.get_selection_from_listbox = sith_lord.get_selection_from_listbox
+
+        self.title = self.make_mahou_label(self, "Mahou no Ongaku", font = ("Trebuchet MS", 30, "bold"))
+        self.title.pack(pady = 20)
+
+        self.music_listbox = self.make_mahou_listbox(self)
+        self.music_listbox.pack(padx = 20, pady = (0, 20), side = "left", fill = "both")
+        self.music_listbox.bind("<<ListboxSelect>>", self.get_selection_from_listbox)
+
+        self.scrollbar = self.make_mahou_scrollbar(self)
+        self.scrollbar.pack(side = "right", fill = "y")
+        self.music_listbox.config(yscrollcommand = self.scrollbar.set) #Pra scrollbar funcionar
+        self.scrollbar.config(command = self.music_listbox.yview)
+        
+        self.play_button = self.make_mahou_button(
+            self,
+            "▶ PLAY",
+            command = sith_lord.toggle
+            )
+        
+        self.play_button.pack(pady = 10)
+
+        self.folder_button = self.make_mahou_button(self, "Choose folder", command = sith_lord.get_folder_path)
+        self.folder_button.pack()
+
+        self.restart_song_button = self.make_mahou_button(self, "Restart song", command = sith_lord.restart_song)
+        self.restart_song_button.pack(pady = (10,0), padx = 10)
+        
+        self.previous_song_button = self.make_mahou_button(self, "Previous", command = sith_lord.goto_previous_song)
+        self.previous_song_button.pack(pady = (10,0), padx = 10)
+
+        self.next_song_button = self.make_mahou_button(self, "Next", command = sith_lord.goto_next_song)
+        self.next_song_button.pack(pady = 10, padx = 10)
+
+        #endregion
+
+        log.debug("Main screen created")
+
+        #endregion
+
+
+    #region ------------------ #01 RESOURCES
+
+    def show_playing_label(self, songname):
+        if not self.playing_label_exists:
+            self.playing_label = self.make_mahou_label(
+                self,
+                f"Now Playing: {songname}",
+                font = ("Bahnschrift", 16)
+                )
+            self.playing_label.pack()
+            log.debug("playing label created and shown")
+
+            self.playing_label_exists = True
+        else:
+            self.playing_label.config(text = f"Now Playing: {songname}")
+            log.debug("playing label changed")
+
+    def listbox_select(self, index):
+        self.music_listbox.select_clear(0, tk.END)
+        self.music_listbox.select_set(index)
+
+        
+    #endregion
+
+    #region ------------------ #02 WIDGETMAKER
+
+    def make_mahou_label(self, parent, wanted_text: str, **settings):
+        default_settings = {
+            "font": ("Bahnschrift", 14),
+            "bg": self.root.cget("bg") or "#000000",
+            "fg": "#ffffff",
+            "anchor": "center",
+            "justify": "center",
+            "wraplength": 400
+        }
+        chosen_settings = default_settings.copy()
+        chosen_settings.update(settings)
+
+        return tk.Label(parent, text = wanted_text, **chosen_settings)
+
+    def make_mahou_button(self, parent, button_text: str, command, **settings):
+        default_config = {
+            "font": ("Bahnschrift", 14),
+            "width": 20,
+            "height": 2,
+            "bg": "#222222",
+            "fg": "#ffffff",
+            "activebackground": "#333333",
+            "activeforeground": "#ffffff"
+        }
+        
+        chosen_settings = default_config.copy()
+        chosen_settings.update(settings)
+
+        return tk.Button(parent, text = button_text, command = command, **chosen_settings)
+
+    def make_mahou_listbox(self, parent, **listbox_config):
+        default_config = {
+            "font": ("Segoe UI Semibold", 12),
+            # "bg": parent.cget("bg") or "#000000",
+            "bg": "#2E2E2E",
+            "fg": "#ffffff",
+            "selectbackground": "#616161",
+            "selectforeground": "#ffffff",
+            "width": 50,
+            "height": 14,
+            "highlightthickness": 0,
+            "borderwidth": 0,
+            "activestyle": "none"
+        }
+
+        chosen_config = default_config.copy()
+        chosen_config.update(listbox_config)
+
+        return tk.Listbox(parent, **chosen_config)
+
+    def make_mahou_scrollbar(self, parent):
+        style = ttk.Style()
+        style.theme_use("clam")
+
+        style.configure(
+            "Vertical.TScrollbar",
+            background = "#b8b8b8",
+            troughcolor = "#1a1a1a",
+            bordercolor = "#1a1a1a",
+            arrowcolor = "#ffffff",
+            relief = "flat"
+        )
+
+        return ttk.Scrollbar(parent, orient = "vertical", style = "Vertical.TScrollbar")
+        
+#endregion
+
+
+
+
+    

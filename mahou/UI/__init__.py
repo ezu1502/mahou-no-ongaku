@@ -1,0 +1,1 @@
+from mahou.UI.new_window import MahouWindow

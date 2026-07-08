@@ -1,8 +1,8 @@
-from new_window import MahouWindow
-from player import MahouPlayer
+from mahou.UI.new_window import MahouWindow
+from mahou.player import MahouPlayer
 import logging
-from ENUMS import PS
-from colors import painted_string, COLORS
+from mahou.core.ENUMS import PS
+from mahou.colors import painted_string, COLORS
 
 log = logging.getLogger(painted_string("MahouApp", "#FF00D4"))
 

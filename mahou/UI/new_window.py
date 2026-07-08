@@ -3,10 +3,10 @@ import logging
 import os
 from pathlib import Path
 from tkinter import filedialog as explorer
-from ENUMS import PS
-from colors import COLORS, painted_string
+from mahou.core.ENUMS import PS
+from mahou.colors import COLORS, painted_string
 from tkinter import ttk
-from song_library import SongLibrary
+from mahou.core.song_library import SongLibrary
 
 log = logging.getLogger(painted_string("MahouWindow", "#7AF9FD"))
 

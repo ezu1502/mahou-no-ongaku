@@ -1,18 +1,14 @@
 import os; os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-import time
 import logging
 from functools import wraps
-from ENUMS import PS
-from colors import COLORS, painted_string
-from new_window import MahouWindow
-from player import MahouPlayer
-from app_class import App
+# from mahou import PS, MahouPlayer, MahouWindow # NÃO USADOS AINDA, MAS JÁ COMENTADOS AQUI PRA FACILITAR DEPOIS
+from mahou import COLORS, painted_string, App
 
 logging.basicConfig(
     level = logging.DEBUG, 
     format = "%(levelname)-5s |  %(message)-30s -> CAST BY: \033[96m%(name)s\033[0m"
     )
-
+    
 log = logging.getLogger(painted_string("main", "#FF7B00"))
 program_is_running = True
 FPS = 60

@@ -7,6 +7,8 @@ from mahou.core.ENUMS import PS
 from mahou.colors import COLORS, painted_string
 from tkinter import ttk
 from mahou.core.song_library import SongLibrary
+from mahou.core.song import Song
+from mahou.utils.mahou_math import is_even
 
 log = logging.getLogger(painted_string("MahouWindow", "#7AF9FD"))
 
@@ -91,14 +93,23 @@ class MahouWindow:
 #region ------------------ #01 - PLAYER CONTROLS
 
     def play_song_by_index(self, index: int):
-        current_path: Path = self.library.path_list[index]
+        self.reset_listbox_ui()
+        current_song = self.library.song_list[index]
+        self.mahou_player.load_song(current_song.path)
+        self.mahou_player.play_song()
+
+        self.playing_song_name = current_song.display_name
         self.playing_song_index = index
 
-        self.playing_song_name = current_path.stem
-        self.mahou_player.load_song(current_path)
-        self.mahou_player.play_song()
+        self.highlight_playing_song(index)
+
         self.set_state(PS.PLAYING)
         self.show_playing_label(self.playing_song_name)
+
+    def highlight_playing_song(self, index):
+        self.music_listbox.delete(index)
+        self.music_listbox.insert(index, f"▶ {self.library.song_list[index].display_name}")
+        self.music_listbox.itemconfig(index, fg = "#FFFF00", bg = "#333333")
 
     def play_without_load(self):
         self.mahou_player.play_without_load()
@@ -108,9 +119,16 @@ class MahouWindow:
 
     def stop_song(self) -> None:
         self.mahou_player.stop_song()
+        self.reset_listbox_ui()
+
+
+    def reset_listbox_ui(self):
+        self.set_listbox_musiclist(self.library.song_list)
+
+
 
     def load_song_index(self, index) -> None:
-        path_to_load: Path = self.library.path_list[index]
+        path_to_load: Path = self.library.song_list[index].path
         self.mahou_player.load_song(path_to_load)
         self.playing_song_index = index
 
@@ -143,7 +161,8 @@ class MahouWindow:
         
         log.debug("'Previous' button pressed")
 
-        folder_length: int = len(self.library.path_list)
+        folder_length: int = len(self.library.song_list)
+
         print(self.selected_index)
         if self.selected_index <= 0:
             self.selected_index = (folder_length - 1)
@@ -157,14 +176,14 @@ class MahouWindow:
             case PS.PAUSED:
                 self.stop_song()
                 self.new_loaded_song = True
-        self.listbox_select(self.selected_index)
+
 
     def goto_next_song(self):
         if self.selected_index is None:
             return
         log.debug("'Previous' button pressed")
 
-        folder_length: int = len(self.library.path_list)
+        folder_length: int = len(self.library.song_list)
         if self.selected_index >= (folder_length - 1):
             self.selected_index = 0
         else:
@@ -177,7 +196,7 @@ class MahouWindow:
             case PS.PAUSED:
                 self.stop_song()
                 self.new_loaded_song = True
-        self.listbox_select(self.selected_index)
+
 
     
     def restart_song(self):
@@ -191,7 +210,7 @@ class MahouWindow:
         elif self.app.state == PS.PAUSED:
             self.stop_song()
             self.load_song_index(self.playing_song_index)
-
+            self.highlight_playing_song(self.playing_song_index)
             log.debug("Restarted song successfully")
         else:
             log.warning("No song to restart, dummy!")
@@ -229,14 +248,22 @@ class MahouWindow:
 
     def set_folder_and_lists(self, folder_path: Path):
         self.library.set_folder(folder_path)
-        self.library.set_lists_from_folder(folder_path)
+        self.library.set_song_list(folder_path)
 
         self.music_listbox.delete(0, tk.END)
-        self.set_listbox_musiclist(self.library.display_list)
+        self.set_listbox_musiclist(self.library.song_list)
 
-    def set_listbox_musiclist(self, list_to_add):
-        for song in list_to_add:
-            self.music_listbox.insert(tk.END, song)
+    def set_listbox_musiclist(self, list_to_add: list[Song]):
+        self.music_listbox.delete(0, tk.END)
+        for indx, song in enumerate(list_to_add, start = 1):
+            self.music_listbox.insert(tk.END, f"   {song.display_name}")
+
+            true_indx = indx - 1
+
+            if true_indx % 2 == 0:
+                self.music_listbox.itemconfig(true_indx, bg = "#111111")
+            else:
+                self.music_listbox.itemconfig(true_indx, bg = "#1B1B1B")
 
     def get_selection_from_listbox(self, event):
         selection = self.music_listbox.curselection()
@@ -246,7 +273,7 @@ class MahouWindow:
         selection_index = selection[0]
         self.selected_index = selection_index   
 
-        self.selection_path = Path(self.library.path_list[selection_index])
+        self.selection_path = Path(self.library.song_list[selection_index].path)
         self.selected_song = self.selection_path.stem
             
         # print(self.selection_path)
@@ -261,7 +288,7 @@ class MahouWindow:
         self.main_screen_frame = tk.Frame(self.root, bg = "#111111")
         self.main_screen_frame.pack(fill = "both", expand = True)
 
-        self.title = self.make_mahou_label(self.main_screen_frame, "Mahou no Ongaku", font = ("Banschrift", 30))
+        self.title = self.make_mahou_label(self.main_screen_frame, "Mahou no Ongaku", font = ("Trebuchet MS", 30, "bold"))
         self.title.pack(pady = 20)
 
         self.music_listbox = self.make_mahou_listbox(self.main_screen_frame)
@@ -350,7 +377,7 @@ class MahouWindow:
     
     def make_mahou_listbox(self, parent, **listbox_config):
         default_config = {
-            "font": ("Segoe UI", 12),
+            "font": ("Segoe UI Semibold", 12),
             # "bg": parent.cget("bg") or "#000000",
             "bg": "#2E2E2E",
             "fg": "#ffffff",

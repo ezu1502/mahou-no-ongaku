@@ -7,8 +7,7 @@ from typing import Callable
 from functools import wraps
 from pathlib import Path
 
-log = logging.getLogger(painted_string("MahouPlayer ☾", "#7700FF"))
-
+log = logging.getLogger(painted_string("MahouPlayer ☾", COLORS.PURPLE))
 
 class MahouPlayer:
     def __init__(self):

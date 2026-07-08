@@ -10,3 +10,7 @@ dist/
 
 # Builds locais
 Mahou\ no\ Ongaku\ -\ True\ Player\ Versions/
+
+# Pastas do VSCode
+.vscode/
+

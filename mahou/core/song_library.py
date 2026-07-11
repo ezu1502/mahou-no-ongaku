@@ -1,6 +1,6 @@
 from pathlib import Path
 import logging
-from mahou.colors import COLORS, painted_string
+from mahou_libs.colors import COLORS, painted_string
 from mahou.core.song import Song
 
 log = logging.getLogger(painted_string("song_library", "#FF0000"))

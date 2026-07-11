@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import logging
-from mahou.colors import painted_string
+from mahou_libs.colors import painted_string
 from mahou.core.ENUMS import PS
 from mahou.core.song import Song
 

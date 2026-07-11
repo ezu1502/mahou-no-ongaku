@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from tkinter import filedialog as explorer
 from mahou.core.ENUMS import PS
-from mahou.colors import painted_string
+from mahou_libs.colors import painted_string
 from mahou.core.song_library import SongLibrary
 from mahou.core.song import Song
 from mahou.UI.main_screen import MainScreen

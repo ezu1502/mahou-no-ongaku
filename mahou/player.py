@@ -2,7 +2,7 @@ import pygame
 from pygame.mixer import music as Pymusic
 import logging
 from mahou.core.ENUMS import PS
-from mahou.colors import COLORS, painted_string
+from mahou_libs.colors import COLORS, painted_string
 from typing import Callable
 from functools import wraps
 from pathlib import Path

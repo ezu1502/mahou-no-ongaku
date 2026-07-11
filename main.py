@@ -2,7 +2,8 @@ import os; os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import logging
 from functools import wraps
 # from mahou import PS, MahouPlayer, MahouWindow # NÃO USADOS AINDA, MAS JÁ COMENTADOS AQUI PRA FACILITAR DEPOIS
-from mahou import COLORS, painted_string, App
+from mahou_libs.colors import COLORS, painted_string
+from mahou import App
 
 logging.basicConfig(
     level = logging.DEBUG, 

@@ -95,7 +95,9 @@ class MahouWindow:
 
     def play_song_by_index(self, index: int):
         self.reset_listbox_ui()
+
         current_song = self.library.song_list[index]
+
         self.mahou_player.load_song(current_song.path)
         self.mahou_player.play_song()
 

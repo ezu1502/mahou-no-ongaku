@@ -23,9 +23,12 @@ class SongLibrary:
 
     def set_song_list(self, folder: Path):
         self.song_list.clear()
-        for file in folder.iterdir():
-            if file.is_file():
-                song = Song(file)
+
+        supported_formats = {".mp3", ".wav", ".ogg", ".m4a", ".flac"}
+
+        for file_path in folder.iterdir():
+            if file_path.is_file() and file_path.suffix.lower() in supported_formats:
+                song = Song(path = file_path)
                 self.song_list.append(song)
         log.debug("song list created")
 

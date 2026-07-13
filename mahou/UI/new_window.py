@@ -9,6 +9,8 @@ from mahou.core.song import Song
 from mahou.UI.main_screen import MainScreen
 from dataclasses import dataclass
 
+from mahou_libs.time_functions import log_delta_time
+
 log = logging.getLogger(painted_string("mahou_window", "#7AF9FD"))
 
 @dataclass
@@ -92,7 +94,7 @@ class MahouWindow:
         return position_and_dimensions
     
     def x_button_was_pressed(self):
-        self.root.destroy()
+        self.root.destroy() #também mata o programa, já que estamos usando o mainloop da window
         log.info("Window destroyed")
 
     def define_window(self, dimensions):
@@ -126,7 +128,7 @@ class MahouWindow:
 
 #endregion
 #region ------------------ #01 PLAYER CONTROLS
-
+    @log_delta_time
     def play_song_by_index(self, index: int):
         self.reset_listbox_ui()
 
@@ -134,14 +136,25 @@ class MahouWindow:
         
         self.playing_song.tuple_set(listbox_list[index])
 
+        song_obj = self.playing_song.song_object
+        if song_obj is None:
+            return 
+        
+
         self.selected_song.reset()
 
-        self.mahou_player.load_song(self.playing_song.song_object)
+        self.mahou_player.load_song(song_obj)
         self.mahou_player.play_song()
 
         self.main_screen.highlight_playing_song(index)
         self.main_screen.show_playing_label(self.playing_song.title)
-        self.main_screen.show_duration(self.playing_song.song_object.base60_duration)  # type: ignore
+        self.main_screen.show_duration(song_obj.base60_duration)  # type: ignore
+
+        # !!!!!!
+        
+        song_obj.load_properties()
+
+        # ! TERMINAR ISSO, TIVE QUE SAIR NO MEIO!!!!!
 
 
     def play_without_load(self):
@@ -165,7 +178,7 @@ class MahouWindow:
             pass
         self.reset_listbox_ui()
 
-
+    @log_delta_time
     def reset_listbox_ui(self):
         self.main_screen.set_listbox_musiclist(self.library.song_list)
 

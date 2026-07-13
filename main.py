@@ -22,5 +22,6 @@ if __name__ == "__main__":
     mahou_app = App()
     mahou_app.run()
 
+    log.info("Program terminated")
+    print()
 
-print()

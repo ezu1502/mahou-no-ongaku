@@ -1,11 +1,11 @@
 from pathlib import Path
-import logging
 from mahou_libs.colors import COLORS, painted_string
 from mahou.core.song import Song
 from send2trash import send2trash
 import json
+from mahou_libs.bocca import BoccaFiglia
 
-log = logging.getLogger(painted_string("song_library", "#FF0000"))
+log = BoccaFiglia("song_library", "#FF0000")
 
 class SongLibrary:
     def __init__(self) -> None:
@@ -60,7 +60,7 @@ class SongLibrary:
                 song = Song(path = file_path)
                 self.song_list.append(song)
                 
-        log.debug("song list created")
+        log.trace("song list created")
 
 # ! cuidado pra n fazer merda kkkkkkkkkkkkk
 

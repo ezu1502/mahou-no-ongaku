@@ -1,1 +1,0 @@
-from mahou.utils.mahou_math import is_even

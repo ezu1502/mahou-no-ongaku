@@ -1,18 +1,29 @@
 import pygame
 from pygame.mixer import music as Pymusic
-import logging
 from mahou.core.ENUMS import PS
 from mahou_libs.colors import COLORS, painted_string
 from typing import Callable
 from functools import wraps
 from pathlib import Path
 from mahou.core.song import Song
-log = logging.getLogger(painted_string("mahou_player", COLORS.PURPLE))
+from bunseki import Analyzer
+from mahou_libs.bocca import BoccaFiglia
+
+log = BoccaFiglia("mahou_player", COLORS.PURPLE)
+
+def analyze(song_obj):
+    song_analysis = song_obj.analysis
+    
+    if song_analysis is None and song_obj.cache_dict is None:
+        song_obj._analysis = Analyzer(song_obj.path)
+
+    log.trace(song_obj.analysis)
+
 
 class MahouPlayer:
     def __init__(self, app):
         pygame.mixer.init()
-        log.debug("MahouPlayer initialized")
+        log.trace("MahouPlayer initialized")
 
         self.app = app
         self.loaded_song: Song | None = None
@@ -33,16 +44,17 @@ class MahouPlayer:
         
         self.loaded_song = song
 
+        if song._analysis is None:
+            log.trace("None")
+            analyze(song)
+            
         if not song.has_cache:
             song.save_analyzer_data_cache()
             
         path = song.path
         Pymusic.load(path)
-        log.debug(f"loaded {path} into MahouPlayer")
+        log.trace(f"loaded {path} into MahouPlayer")
          
-
-
-
     def play_song(self):
         current_state = self.get_state()
 
@@ -74,6 +86,11 @@ class MahouPlayer:
         Pymusic.play()
         self.set_state(PS.PLAYING)
 
-
     def get_song_pos(self):
         return Pymusic.get_pos() / 1000
+
+
+
+
+
+    

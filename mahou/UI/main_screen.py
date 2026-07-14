@@ -4,8 +4,8 @@ import logging
 from mahou_libs.colors import painted_string
 from mahou.core.ENUMS import PS
 from mahou.core.song import Song
-
-log = logging.getLogger(painted_string("main_screen", "#2424F7"))
+from mahou_libs.bocca import BoccaFiglia
+log = BoccaFiglia("main_screen", "#2424F7")
 
 class MainScreen(tk.Frame):
 
@@ -57,7 +57,7 @@ class MainScreen(tk.Frame):
 
         #endregion
 
-        log.debug("Main screen created")
+        log.trace("Main screen created")
 
 
 
@@ -73,12 +73,12 @@ class MainScreen(tk.Frame):
             
             self.playing_label.pack()
 
-            log.debug("playing label created and shown")
+            log.trace("playing label created and shown")
 
             self.playing_label_exists = True
         else:
             self.playing_label.config(text = f"Now Playing: {songname}")
-            log.debug("playing label changed")
+            log.trace("playing label changed")
 
     def show_duration(self, duration: str):
 
@@ -86,11 +86,11 @@ class MainScreen(tk.Frame):
             self.duration_label = self.make_mahou_label(self, wanted_text = duration, font = ("Trebuchet MS", 15, "bold"))
             self.duration_label.pack()
 
-            log.debug("duration label created and shown")
+            log.trace("duration label created and shown")
             self.duration_label_exists = True
         else:
             self.duration_label.config(text = duration)
-            log.debug("duration label changed")
+            log.trace("duration label changed")
 
     def show_play_selection_song(self):
         try:
@@ -123,7 +123,7 @@ class MainScreen(tk.Frame):
             case PS.PAUSED | PS.IN_MENU:
                 self.play_button.config(text = "▶ PLAY")
 
-        log.debug("UI updated by state")    
+        log.trace("UI updated by state")    
 
         
     #endregion

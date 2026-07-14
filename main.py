@@ -1,32 +1,29 @@
-import os; os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-import logging
-from functools import wraps
-# from mahou import PS, MahouPlayer, MahouWindow # NÃO USADOS AINDA, MAS JÁ COMENTADOS AQUI PRA FACILITAR DEPOIS
-from mahou_libs.colors import COLORS, painted_string
+import os; os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"; os.environ["BOCCA_HIDE_GREETING"] = "0"
+from mahou_libs.colors import painted_string
 from mahou import App
+from mahou_libs import bocca
 
-logging.basicConfig(
-    level = logging.DEBUG, 
-    format = "%(levelname)-5s |  %(message)-30s -> CAST BY: \033[96m%(name)s\033[0m"
-    )
+log = bocca.BoccaFiglia("main", "#FFAE00")
 
-log = logging.getLogger(painted_string("main", "#FF7B00"))
+bocca.configure_default_settings()
+bocca.set_core_level(11) # Nível do logger
+
 
 program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS
 
-log.debug(painted_string("Program Started              ", COLORS.RED))
+launch_message = painted_string(f"{'Program Started':<30}", "#FF2222")
 
-log.debug("Main app launched")
+
+log.info(f"{launch_message}")
+log.trace("Main app launched")
 
 try:
     if __name__ == "__main__":
         mahou_app = App()
         mahou_app.run()
-
-        log.info("Program terminated")
-        print()
 finally:
+    print()
     log.info("Program Terminated.")
 

@@ -1,5 +1,4 @@
 import tkinter as tk
-import logging
 from pathlib import Path
 from tkinter import filedialog as explorer
 from mahou.core.ENUMS import PS
@@ -8,10 +7,10 @@ from mahou.core.song_library import SongLibrary
 from mahou.core.song import Song
 from mahou.UI.main_screen import MainScreen
 from dataclasses import dataclass
-
 from mahou_libs.time_functions import log_delta_time
+from mahou_libs.bocca import BoccaFiglia
 
-log = logging.getLogger(painted_string("mahou_window", "#7AF9FD"))
+log = BoccaFiglia("mahou_window", "#7AF9FD")
 
 @dataclass
 class UISong:
@@ -55,13 +54,13 @@ class MahouWindow:
         self.mahou_player = player
         self.library = SongLibrary()
 
-        log.debug("Player and App obj. received in window")
+        log.trace("Player and App obj. received in window")
 
     # ------------- USEFUL VARIABLES
         self.selected_song = UISong(song_object = None, index = None)
         self.playing_song = UISong(song_object = None, index = None)
 
-        log.debug("Window init lists and folder created")
+        log.trace("Window init lists and folder created")
 
     # ------------------------------------------------------------------
 
@@ -111,7 +110,7 @@ class MahouWindow:
 
         self.root.protocol("WM_DELETE_WINDOW", self.x_button_was_pressed)
 
-        log.debug("Window created")
+        log.trace("Window created")
 
     def start_ui_loop(self):
         self.update_dynamic_UI()
@@ -122,7 +121,7 @@ class MahouWindow:
         pass
 
     def run(self):
-        log.debug("MahouWindow is now running")
+        log.trace("MahouWindow is now running")
         self.start_ui_loop()
         self.root.mainloop()
 
@@ -140,11 +139,11 @@ class MahouWindow:
         if song_obj is None:
             return 
         
-
-        self.selected_song.reset()
-
         self.mahou_player.load_song(song_obj)
         self.mahou_player.play_song()
+
+        self.main_screen.update_UI_by_state(self.get_state())
+        self.selected_song.reset()
 
         self.main_screen.highlight_playing_song(index)
         self.main_screen.show_playing_label(self.playing_song.title)
@@ -186,7 +185,7 @@ class MahouWindow:
         self.mahou_player.unpause_song()
 
     def toggle(self):
-        log.debug("toggle function triggered")
+        log.trace("toggle function triggered")
         match self.app.state:
             case PS.IN_MENU:
                 if self.selected_song.index is not None:
@@ -210,7 +209,7 @@ class MahouWindow:
         if self.selected_song.index is None:
             return
         
-        log.debug("'Previous' button pressed")
+        log.trace("'Previous' button pressed")
 
         folder_length: int = len(self.library.song_list)
 
@@ -227,12 +226,12 @@ class MahouWindow:
             case PS.PAUSED:
                 self.stop_song()
 
-
+# TODO finalizar !!!!!!!
 
     def goto_next_song(self):
         if self.selected_song.index is None:
             return
-        log.debug("'Previous' button pressed")
+        log.trace("'Previous' button pressed")
 
         folder_length: int = len(self.library.song_list)
         if self.selected_song.index >= (folder_length - 1):
@@ -248,11 +247,10 @@ class MahouWindow:
                 self.stop_song()
 
 
-
     def change_song(self):
         if self.selected_song.index is None:
             return
-        log.debug("'Previous' button pressed")
+        log.trace("'Previous' button pressed")
 
         folder_length: int = len(self.library.song_list)
         if self.selected_song.index >= (folder_length - 1):
@@ -270,7 +268,7 @@ class MahouWindow:
 
     @log_delta_time
     def restart_song(self):
-        log.debug("Restart Button pressed")
+        log.trace("Restart Button pressed")
 
         if self.playing_song.index is None:
             return

@@ -28,14 +28,14 @@ class MahouPlayer:
 
 # ------------------ MUSIC CONTROLS
     def load_song(self, song: Song):
-        self.loaded_song = song
-
         if not isinstance(song, Song):
             raise ValueError(f"Argument {song} is not a Song object!")
         
+        self.loaded_song = song
 
         if not song.has_cache:
             song.save_analyzer_data_cache()
+            
         path = song.path
         Pymusic.load(path)
         log.debug(f"loaded {path} into MahouPlayer")

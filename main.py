@@ -9,8 +9,9 @@ logging.basicConfig(
     level = logging.DEBUG, 
     format = "%(levelname)-5s |  %(message)-30s -> CAST BY: \033[96m%(name)s\033[0m"
     )
-    
+
 log = logging.getLogger(painted_string("main", "#FF7B00"))
+
 program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS

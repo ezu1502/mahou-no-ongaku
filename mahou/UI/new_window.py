@@ -150,13 +150,6 @@ class MahouWindow:
         self.main_screen.show_playing_label(self.playing_song.title)
         self.main_screen.show_duration(song_obj.base60_duration)  # type: ignore
 
-        # !!!!!!
-        
-        song_obj.load_properties()
-
-        # ! TERMINAR ISSO, TIVE QUE SAIR NO MEIO!!!!!
-
-
     def play_without_load(self):
         self.mahou_player.play_without_load()
 
@@ -167,6 +160,8 @@ class MahouWindow:
     def stop_song(self, destroy_duration = True, destroy_playing_label = True) -> None:
         self.mahou_player.stop_song()
         try:
+            # TODO mexer aqui ainda
+            
             if destroy_playing_label:
                 self.main_screen.playing_label.destroy()
                 self.main_screen.playing_label_exists = False
@@ -181,7 +176,7 @@ class MahouWindow:
     @log_delta_time
     def reset_listbox_ui(self):
         self.main_screen.set_listbox_musiclist(self.library.song_list)
-
+    @log_delta_time
     def load_song_index(self, index) -> None:
         path_to_load: Path = self.library.song_list[index].path
         self.mahou_player.load_song(path_to_load)
@@ -273,7 +268,7 @@ class MahouWindow:
                 self.stop_song()
 
 
-    
+    @log_delta_time
     def restart_song(self):
         log.debug("Restart Button pressed")
 

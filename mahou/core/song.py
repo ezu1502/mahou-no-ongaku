@@ -8,6 +8,7 @@ from mahou_libs import mahou_math
 from send2trash import send2trash
 import logging
 from mahou_libs import painted_string
+import threading
 
 #Cada música vai ser uma class agora
 log = logging.getLogger(painted_string("Song_Class", "#00FF00"))
@@ -21,33 +22,26 @@ class Song:
         repr = False, # Não mostra o Analyzer quando referenciar (song)
         compare = False # Não diz que 2 musicas são diferentes só por uma ter sido analisada e outra não
     )   
-    
-    @property
-    def analysis(self) -> Analyzer:
-        if self._analysis is None:
-            self._analysis = Analyzer(self.path)
-        return self._analysis
-    
-    @property
-    def properties(self):
-        properties = self.analysis.properties
-        if properties is not None:
-            return properties
-        return None
-    
 
-    def load_properties(self):
-        properties = self.properties
-        if properties is None:
-            self.analysis.load_heavy_analysis()
+    def analyze(self):
+        def put_bunseki_to_work():
+            if self._analysis is None and self.cache_dict is None:
+                self._analysis = Analyzer(self.path)
+        put_bunseki_to_work()
+        # thread = threading.Thread(target = put_bunseki_to_work)
+        # thread.start()
+
+    @property
+    def analysis(self):
+        if self._analysis is None and self.cache_dict is None:
+            self.analyze()
+        if self._analysis is not None:
+            return self._analysis
             
-        
-
-
     @property
     def cache(self):
         cache_dict = self.cache_dict
-        if self.properties is not None or cache_dict is None:
+        if self._analysis is not None or cache_dict is None:
             return None
         return CacheDoppelganger(duration = cache_dict["duration_seconds"])
     
@@ -70,30 +64,33 @@ class Song:
         return self.title
     
     @property
-    def _properties_or_cache(self):
-        properties = self.properties
+    def _analysis_or_cache(self):
+        analysis = self.analysis
         cache = self.cache
 
-        if properties is not None:
+        if analysis is not None:
             log.debug("Bunseki analysis used")
-            return properties
+            return analysis
         elif cache is not None:
             log.debug("cache used")
             return cache
         
-        raise RuntimeError("Both analysis and cache were none, couldn't complete request"
-        "\n maybe you forgot loading heavy analysis?")
+        raise RuntimeError("Both analysis and cache were none, couldn't complete request")
 
     @property
     def duration(self) -> int | float:
-        return self.analysis.duration # type: ignore
+        return self._analysis_or_cache.duration
+        
         
     @property
     def base60_duration(self):
-        return mahou_math.conversions.seconds_to_base60(self.duration)
+        if self.analysis is not None:
+            return self.analysis.base60_duration_str
+        else:
+            return mahou_math.conversions.seconds_to_base60(self.duration)
             
-    def undo_heavy_analysis(self):
-        self.analysis.properties = None
+    def clear_analysis(self):
+        self._analysis = None
     
 #endregion
 #region CACHE
@@ -105,7 +102,7 @@ class Song:
         cache_tools.save_song_cache(self.cache_file, analysis_dictionary)
 
     def save_analyzer_data_cache(self):
-        if self.properties is not None:
+        if self.analysis is not None:
             self.save_cache(self.analysis.get_analysis_dictionary())
             log.info(f"{self.title} cache generated!")
     

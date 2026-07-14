@@ -13,7 +13,8 @@ program_is_running = True
 FPS = 60
 FRAME_TIME = 1/FPS
 
-launch_message = painted_string(f"{'Program Started':<30}", "#FF2222")
+launch_message = painted_string(f"{'Program Started.':<30}", "#FF2222")
+end_message = painted_string(f"{'Program Terminated.':<30}", "#FF2222")
 
 
 log.info(f"{launch_message}")
@@ -25,5 +26,5 @@ try:
         mahou_app.run()
 finally:
     print()
-    log.info("Program Terminated.")
+    log.info(end_message)
 

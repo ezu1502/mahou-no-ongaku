@@ -200,8 +200,6 @@ class MainScreen(tk.Frame):
     def set_listbox_musiclist(self, list_to_add: list[Song]):
         self.music_listbox.delete(0, tk.END)
 
-        
-        
         for indx, song in enumerate(list_to_add):
             self.listbox_list.append((indx, song)) # Não esquecer da ordem [0]INDEX [1]SONG
 

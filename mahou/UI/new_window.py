@@ -129,7 +129,7 @@ class MahouWindow:
 #region ------------------ #01 PLAYER CONTROLS
     @log_delta_time
     def play_song_by_index(self, index: int):
-        self.reset_listbox_ui()
+        
 
         listbox_list = self.main_screen.listbox_list
         
@@ -144,6 +144,9 @@ class MahouWindow:
 
         self.main_screen.update_UI_by_state(self.get_state())
         self.selected_song.reset()
+
+        self.reset_listbox_ui()
+        
 
         self.main_screen.highlight_playing_song(index)
         self.main_screen.show_playing_label(self.playing_song.title)
@@ -175,6 +178,7 @@ class MahouWindow:
     @log_delta_time
     def reset_listbox_ui(self):
         self.main_screen.set_listbox_musiclist(self.library.song_list)
+        
     @log_delta_time
     def load_song_index(self, index) -> None:
         path_to_load: Path = self.library.song_list[index].path

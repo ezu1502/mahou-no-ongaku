@@ -55,6 +55,14 @@ class MainScreen(tk.Frame):
         self.next_song_button = self.make_mahou_button(self, "Next", command = lambda: sith_lord.change_song(1))
         self.next_song_button.pack(pady = (10, 1), padx = 10)
 
+        self.play_selection_button = self.make_mahou_button(
+            self,
+            f"Play Selected Song",
+            command = self.play_selected_song_button
+            )
+        
+        self.playing_label = None
+
         #endregion
 
         log.trace("Main screen created")
@@ -63,22 +71,25 @@ class MainScreen(tk.Frame):
 
     #region ------------------ #01 RESOURCES
 
-    def show_playing_label(self, songname):
-        if not self.playing_label_exists:
+    def set_playing_label(self, songname = "null", visible = True):
+        if not visible and self.playing_label is not None:
+            self.playing_label.pack_forget()
+            return
+        
+        if self.playing_label is None:
             self.playing_label = self.make_mahou_label(
-                self,
-                f"Now Playing: {songname}",
-                font = ("Bahnschrift", 16)
-                )
-            
+                    self,
+                    f"Now Playing: {songname}",
+                    font = ("Bahnschrift", 16)
+                    )
             self.playing_label.pack()
+            return
+        
+        self.playing_label.config(text = f"Now Playing: {songname}", font = ("Bahnschrift", 16))
 
-            log.trace("playing label created and shown")
+        
 
-            self.playing_label_exists = True
-        else:
-            self.playing_label.config(text = f"Now Playing: {songname}")
-            log.trace("playing label changed")
+    
 
     def show_duration(self, duration: str):
 
@@ -92,19 +103,17 @@ class MainScreen(tk.Frame):
             self.duration_label.config(text = duration)
             log.trace("duration label changed")
 
-    def show_play_selection_song(self):
-        try:
-            self.play_selection_button.destroy()
-        except:
-            pass
-        finally:
-            self.play_selection_button = self.make_mahou_button(self, f"Play Selected Song", command = self.play_selected_song_button)
-            self.play_selection_button.pack()
-
     
+    def set_selectedb_visibility(self, visible: bool):
+        if visible:
+            self.play_selection_button.pack()
+        else:
+            self.play_selection_button.pack_forget()
+
+
     def play_selected_song_button(self):
         self.sith_lord.play_selected_song_button()
-        self.play_selection_button.destroy()
+        self.set_selectedb_visibility(visible = False)
 
     def listbox_select(self, index):
         self.music_listbox.select_clear(0, tk.END)
@@ -114,8 +123,7 @@ class MainScreen(tk.Frame):
         self.music_listbox.delete(index)
         self.music_listbox.insert(index, f"▶ {self.sith_lord.library.song_list[index].display_name}")
         self.music_listbox.itemconfig(index, fg = "#FFFF00", bg = "#333333")
-
-
+        
     def update_UI_by_state(self, state):
         match state:
             case PS.PLAYING:

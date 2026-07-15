@@ -143,11 +143,8 @@ class MahouWindow:
         self.main_screen.update_UI_by_state(self.get_state())
         self.selected_song.reset()
 
-        # self.reset_listbox_ui()
-        
-
         self.main_screen.highlight_playing_song(index)
-        self.main_screen.show_playing_label(self.playing_song.title)
+        self.main_screen.set_playing_label(self.playing_song.title)
         self.main_screen.show_duration(song_obj.base60_duration)  # type: ignore
 
     def play_without_load(self):
@@ -157,20 +154,16 @@ class MahouWindow:
         self.mahou_player.pause_song()
     
 
-    def stop_song(self, destroy_duration = True, destroy_playing_label = True) -> None:
+    def stop_song(self, hide_duration = True, hide_playing_label = True) -> None:
         self.mahou_player.stop_song()
-        try:
-            # TODO mexer aqui ainda
-            
-            if destroy_playing_label:
-                self.main_screen.playing_label.destroy()
-                self.main_screen.playing_label_exists = False
-
-            if destroy_duration:
-                self.main_screen.duration_label.destroy()
-                self.main_screen.duration_label_exists = False
-        except:
-            pass
+        # TODO mexer aqui ainda
+        
+        if hide_playing_label:
+            self.main_screen.set_playing_label(visible = False)
+        if hide_duration:
+            self.main_screen.duration_label.destroy()
+            self.main_screen.duration_label_exists = False
+        # ! CONTINUAR AQUI!!!!!
         self.reset_listbox_ui()
 
     def reset_listbox_ui(self):
@@ -300,7 +293,7 @@ class MahouWindow:
 
         match self.get_state():
             case PS.PLAYING | PS.PAUSED:
-                self.main_screen.show_play_selection_song()
+                self.main_screen.set_selectedb_visibility(visible = True)
 
 
 #endregion

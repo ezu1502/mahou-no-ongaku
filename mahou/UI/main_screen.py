@@ -28,8 +28,8 @@ class MainScreen(tk.Frame):
         self.music_listbox = self.make_mahou_listbox(self)
         self.music_listbox.pack(padx = 20, pady = (0, 20), side = "left", fill = "both")
         self.music_listbox.bind("<<ListboxSelect>>", self.get_selection_from_listbox)
-        self.music_listbox.bind("<Up>", lambda select_up: self.change_selection(-1, select_up))
-        self.music_listbox.bind("<Down>", lambda select_down: self.change_selection(1))
+        self.music_listbox.bind("<Up>", lambda s: self.change_selection(-1))
+        self.music_listbox.bind("<Down>", lambda s: self.change_selection(1))
 
         self.listbox_list = []
     
@@ -94,7 +94,10 @@ class MainScreen(tk.Frame):
         self.playing_label.config(text = f"Now Playing: {songname}", font = ("Bahnschrift", 16))
         self.playing_label.pack()
 
-        
+    def clear_listbox_selection(self):
+        self.music_listbox.select_clear(0, tk.END)
+
+
     def set_duration_label(self, duration: str = "null", visible = True):
         if not visible and self.duration_label is not None:
             self.duration_label.pack_forget()
@@ -113,7 +116,7 @@ class MainScreen(tk.Frame):
     
     def set_selectedb_visibility(self, visible: bool):
         if visible:
-            self.play_selection_button.pack()
+            self.play_selection_button.pack(pady = 10)
         else:
             self.play_selection_button.pack_forget()
 
@@ -130,10 +133,22 @@ class MainScreen(tk.Frame):
     def change_selection(self, change, event = None):
         if change == 0:
             return
+        
         index = self.get_selection_from_listbox()
-        print(self.get_selection_from_listbox())
-        self.listbox_select(index + change)
-        self.sith_lord.select(self.listbox_list[index + change][0], index + change)
+
+        new_index = index + change
+
+        length = len(self.listbox_list)
+
+        if new_index < 0:
+            new_index = length - 1
+        if new_index > length - 1:
+            new_index = 0
+    
+        
+        self.listbox_select(new_index)
+        
+        self.sith_lord.set_selected_song(self.listbox_list[new_index][0], new_index)
         return "break"
         
 

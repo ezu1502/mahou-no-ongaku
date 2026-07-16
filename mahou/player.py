@@ -90,6 +90,9 @@ class MahouPlayer:
         return Pymusic.get_pos() / 1000
 
 
+    def detect_song_end(self):
+        if self.get_state() == PS.PLAYING and not Pymusic.get_busy():
+            self.set_state(PS.IN_MENU)
 
 
 

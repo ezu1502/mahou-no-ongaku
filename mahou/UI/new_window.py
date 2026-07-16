@@ -154,12 +154,13 @@ class MahouWindow:
         
         self.selected_song.reset()
 
-
         self.main_screen.highlight_playing_song(index)
+        self.main_screen.clear_listbox_selection()
+        self.main_screen.music_listbox.see(index)
+
         self.main_screen.set_playing_label(self.playing_song.title) # type: ignore
         self.main_screen.set_duration_label(song_obj.base60_duration)  # type: ignore
 
-        print(self.main_screen.get_selection_from_listbox)
 
     def play_without_load(self):
         self.mahou_player.play_without_load()
@@ -168,17 +169,18 @@ class MahouWindow:
         self.mahou_player.pause_song()
     
 
-    def stop_song(self, hide_duration = True, hide_playing_label = True) -> None:
+    def stop_song(self, hide_duration = True, hide_playing_label = True, hide_ps_button = False) -> None:
         self.mahou_player.stop_song()
         if hide_playing_label:
             self.main_screen.set_playing_label(visible = False)
         if hide_duration:
             self.main_screen.set_duration_label(visible = False)
+        if hide_ps_button:
+            self.main_screen.set_selectedb_visibility(visible = False)
 
         self.set_state(PS.IN_MENU)
 
         
-    
     def load_song_index(self, index) -> None:
         song_to_load = self.library.song_list[index]
         self.mahou_player.load_song(song_to_load)
@@ -218,25 +220,16 @@ class MahouWindow:
 
         if index is None:
             return
-
         length = len(self.library.song_list)
 
         new_index = index + change
 
-        
-
         if new_index < 0:
             new_index = length - 1
-            
             
         elif new_index > (length - 1):
             new_index = 0
      
-
-        percent = new_index / length
-        self.main_screen.music_listbox.yview_moveto(percent)
-
-
         match self.app.state:
             case PS.PLAYING:
                 self.stop_song()
@@ -321,7 +314,10 @@ class MahouWindow:
                     
         self.set_selected_song_by_listbox(selected_listbox_index)
 
+        print(selected_listbox_index)
         return selected_listbox_index
+    
+
 #endregion
 
 #region ------------------ #04 KEYBOARD
@@ -363,9 +359,10 @@ class MahouWindow:
             tags.remove("Listbox")
            
 
-    def select(self, song: Song, index: int):
+    def set_selected_song(self, song: Song, index: int):
         self.selected_song.tuple_set((index, song))
-        self.main_screen.set_selectedb_visibility(visible = True)
+        if self.get_state() == PS.PLAYING:
+            self.main_screen.set_selectedb_visibility(visible = True)
 
 
 

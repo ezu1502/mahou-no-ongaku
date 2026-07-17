@@ -60,19 +60,4 @@ class SongLibrary:
                 
         log.debug("song list created")
 
-# ! cuidado pra n fazer merda kkkkkkkkkkkkk
-
-    def clear_all_songs_cache(self):
-        folder = Path ("mahou_cache") / ("song_cache")
-        if not folder.exists():
-            return
-        for file in Path.iterdir(folder):
-            if file.suffix != ".json" or not file.is_file():
-                log.warning("Cannot erase folder, as you may be trying to erase something you dont really wanna remove...")
-                return
-        
-        send2trash(folder)
-        log.info("Songs cache cleared.")
-            
-        
 

@@ -1,0 +1,113 @@
+
+QMainWindow {
+    background-color: qlineargradient(
+        x1:0, y1:0,
+        x2:0, y2:1,
+
+        stop:0 #141414,
+        stop:1 #0a0a0a
+    )
+}
+
+QLabel#title {
+    color: #EEEEEE;
+    font-family: "Bahnschrift";
+    font-size: 45px;
+}
+
+
+QPushButton {
+    background-color: #090909;
+    color: #EEEEEE;
+
+    border-top: 1px solid #4A4A4A;
+    border-left: 1px solid #404040;
+    border-bottom: 1px solid #000000;
+    border-right: 1px solid #000000;
+
+
+    border-radius: 3;
+    font-family: "Bahnschrift";
+    font-size: 30px;
+    outline: none;
+}
+
+QPushButton:hover {
+    background-color: #111111;
+}
+
+QPushButton:pressed {
+    background-color: #333333;
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #4A4A4A;
+    border-right: 1px solid #404040;
+}
+
+QListWidget {
+    background-color: #141414;
+    color: #EEEEEE;
+    font-family: "Bahnschrift";
+    font-size: 16px;
+
+    outline: none;
+
+    border: 2px solid #404040;
+    border-radius: 2px;
+    show-decoration-selected: 1;
+
+
+    alternate-background-color: qlineargradient(
+        x1:0, y1:0,
+        x2:1, y2:0,
+
+        stop:0 #202020,
+        stop:1 #171717
+    )
+    
+}
+
+QListWidget::item {
+    padding: 8px;
+    font-weight: bold;
+}   
+QListWidget::item:hover {
+    background: #2a2a2a;
+    border: none
+}   
+QListWidget::item:selected {
+    background: #555555;
+    border: none
+}   
+QListWidget::item:selected:!active {
+    color: #EEEEEE;
+}   
+QListWidget::item:selected:!active {
+    
+}   
+
+QScrollBar:vertical {
+    background: #101010;
+    width: 12px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical{
+    background: #404040;
+    border-radius: 3px;
+    min-height: 50px;
+}
+
+QScrollBar::handle:vertical:hover{
+    background: #555555;
+}
+QScrollBar::handle:vertical:pressed{
+    background: #9900ff;
+}
+
+QScrollBar::add-page:vertical {
+    background: #222222
+}
+QScrollBar::sub-page:vertical {
+    background: #222222
+}

@@ -14,7 +14,6 @@ end_message = painted_string(f"{'Program Terminated.':<30}", "#FF2222")
 
 
 log.info(f"{launch_message}")
-log.trace("Main app launched")
 
 try:
     if __name__ == "__main__":

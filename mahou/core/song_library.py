@@ -63,7 +63,7 @@ class SongLibrary:
                 song = Song(path = file_path)
                 self.song_list.append(song)
     
-        self.song_list.sort(key = lambda song: song.title)
+        self.song_list.sort(key = lambda song: song.title.lower())
                 
         log.debug("song list set")
 

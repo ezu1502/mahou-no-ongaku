@@ -25,7 +25,6 @@ class MahouPlayer:
         pymusic.play()
         self.app.set_state(PS.PLAYING)
 
-
     def pause_song(self):
         pymusic.pause()
         self.app.set_state(PS.PAUSED)
@@ -34,7 +33,13 @@ class MahouPlayer:
         pymusic.unpause()
         self.app.set_state(PS.PLAYING)
 
-    def stop_song(self):
+    def stop_song(self, reset_loaded_song = True):
         pymusic.stop()
-        self.loaded_song = None
+        if reset_loaded_song:
+            self.loaded_song = None
         self.app.set_state(PS.IN_MENU)
+
+    def return_song_list(self):
+        return self.app.library.song_list
+    
+    

@@ -61,7 +61,8 @@ class MahouInterface(QMainWindow):
         self.right_panel_widget = QWidget()
         
         self.right_panel = QVBoxLayout()
-        self.right_panel.setAlignment(align.AlignTop)
+        self.right_panel.setAlignment(align.AlignTop | align.AlignHCenter)
+        self.right_panel.setSpacing(15)
 
         self.right_panel_widget.setLayout(self.right_panel)
 
@@ -73,20 +74,49 @@ class MahouInterface(QMainWindow):
         self.play_pause_button.setFixedSize(300, 60)
         self.play_pause_button.pressed.connect(self.player_bridge.toggle)
 
-        self.right_panel.addWidget(self.play_pause_button, alignment = align.AlignHCenter)
+        self.right_panel.addWidget(self.play_pause_button)
 
         # * FOLDER BUTTON ---
         self.folder_button = QPushButton("Choose Folder")
         self.folder_button.setFixedSize(300, 60)
         self.folder_button.pressed.connect(self.choose_folder)
         
-        self.right_panel.addWidget(self.folder_button, alignment = align.AlignHCenter)
+        self.right_panel.addWidget(self.folder_button)
 
         # * RESTART SONG BUTTON --
         
         self.restart_button = QPushButton("Restart Song")
-        self.folder_button.setFixedSize(300, 60)
-        self.folder_button.pressed.connect(self.player_bridge.restart_song)
+        self.restart_button.setFixedSize(300, 60)
+        self.restart_button.pressed.connect(self.player_bridge.restart_song)
+        self.right_panel.addWidget(self.restart_button)
+        
+        # * PREVIOUS/NEXT SONG BUTTONS
+
+        self.previous_next_widget = QWidget()
+        self.previous_next_widget.setFixedSize(300, 60)
+
+        self.previous_next_layout = QHBoxLayout()
+        self.previous_next_layout.setContentsMargins(0,0,0,0)
+        self.previous_next_layout.setSpacing(20)
+
+        self.previous_next_widget.setLayout(self.previous_next_layout)
+
+        self.previous_button = QPushButton("Previous")
+        self.previous_button.setFixedSize(145, 60)
+        self.previous_button.pressed.connect(lambda: self.player_bridge.change_song(-1))
+
+
+        self.next_button = QPushButton("Next")
+        self.next_button.setFixedSize(145, 60)
+        self.next_button.pressed.connect(lambda: self.player_bridge.change_song(1))
+
+        self.previous_next_layout.addWidget(self.previous_button, alignment = align.AlignLeft)
+        self.previous_next_layout.addWidget(self.next_button, alignment = align.AlignRight)
+
+        self.right_panel.addWidget(self.previous_next_widget)
+        
+
+
 
         # * -------
 
@@ -158,6 +188,9 @@ class MahouInterface(QMainWindow):
         new_item.setForeground(QColor("#FFFF00"))
         new_item.setSelected(False)
 
+    def song_list_length(self) -> int:
+        return len(self.app.library.song_list)
+
     def get_state(self):
         return self.app.state
     
@@ -165,7 +198,8 @@ class MahouInterface(QMainWindow):
         self.app.state = state
         self.update_UI_by_state()
 
-    
+    def see_item(self, item):
+        self.listbox.scrollToItem(item)
     #endregion
 
     #region STYLESHEET

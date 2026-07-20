@@ -1,20 +1,41 @@
 from pathlib import Path
-from PySide6.QtCore import QObject, QUrl
+from PySide6.QtCore import QObject, QUrl, Signal
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from mahou.core.song import Song
 from mahou.core.ENUMS import PS
 
+PlayerState =  QMediaPlayer.PlaybackState
+
 class MahouPlayer(QObject):
-    def init(self, app):
+    state_changed = Signal()
+    def __init__(self, app):
+        super().__init__()
+
         self.app = app
         
         self.media_player = QMediaPlayer(self)
         self.audio_output = QAudioOutput(self)
 
         self.media_player.setAudioOutput(self.audio_output)
+        self.media_player.playbackStateChanged.connect(self.handle_playback_state)
+        self.media_player.errorOccurred.connect(self.handle_error)
 
         self.current_song: Song | None = None
+        
+    def handle_error(self):
+        pass
+
+    def handle_playback_state(self, state: PlayerState):
+        match state:
+            case PlayerState.PlayingState:
+                self.app.set_state(PS.PLAYING)
+            case PlayerState.PausedState:
+                self.app.set_state(PS.PAUSED)
+            case PlayerState.StoppedState:
+                self.app.set_state(PS.IN_MENU)
+
+        self.state_changed.emit()
 
 
     def load_song(self, song: Song):
@@ -22,8 +43,8 @@ class MahouPlayer(QObject):
         if not path.is_file():
             raise FileNotFoundError(f"Song path {path} does not exist or is not a valid song path")
         
-        path_string = str(path)
-        path_url = QUrl.fromLocalFile(path_string)
+        
+        path_url = QUrl.fromLocalFile(str(path))
 
         self.media_player.setSource(path_url)
 
@@ -31,11 +52,9 @@ class MahouPlayer(QObject):
 
     def play_song(self):
         self.media_player.play()
-        self.app.set_state(PS.PLAYING)
 
     def pause_song(self):
         self.media_player.pause()
-        self.app.set_state(PS.PAUSED)
 
     def stop_song(self):
         self.media_player.stop()

@@ -5,7 +5,11 @@ from PySide6.QtGui import Qt, QColor, QBrush
 class PlayerBridge:
     def __init__(self, window):
         self.window = window
+
         self.player = self.window.player
+        self.player.state_changed.connect(self.window.update_UI_by_state)
+
+
         self.app = self.window.app
 
         self.no_need_to_load = False
@@ -24,7 +28,7 @@ class PlayerBridge:
                     self.play_without_loading()
                     self.no_need_to_load = False
                 else:
-                    self.player.unpause_song()
+                    self.player.play_song()
             case PS.IN_MENU:
                 self.load_and_play()
         self.window.update_UI_by_state()

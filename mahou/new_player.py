@@ -54,7 +54,8 @@ class MahouPlayer(QObject):
             case PlayerState.PausedState:
                 self.app.set_state(PS.PAUSED)
             case PlayerState.StoppedState:
-                self.app.set_state(PS.IN_MENU)
+                # self.app.set_state(PS.IN_MENU)
+                pass
 
         self.state_changed.emit()
 

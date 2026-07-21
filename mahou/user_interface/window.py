@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
 QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider)
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence
+from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from mahou_libs.time_functions import log_delta_time
 from pathlib import Path
 from mahou.core.song import Song
@@ -39,6 +39,7 @@ class MahouInterface(QMainWindow):
         self.main_layout.setAlignment(align.AlignTop)
         self.central_widget.setLayout(self.main_layout)
 
+        self.setup_menu_bar()
         self.set_interface_aspect()
         self.set_shortcuts()
 
@@ -85,9 +86,62 @@ class MahouInterface(QMainWindow):
         self.enter_key.activated.connect(self.player_bridge.load_and_play)
 
     
-    
+    def setup_menu_bar(self):
+        self.menu_bar = self.menuBar()
+
+        self.file_menu = self.menu_bar.addMenu("File")
+        self.view_menu = self.menu_bar.addMenu("View")
+        self.themes_menu = self.menu_bar.addMenu("Theme")
+        self.shortcuts_menu = self.menu_bar.addMenu("Shortcuts")
+        self.about_menu = self.menu_bar.addMenu("About")
+
+        self.choose_folder_action = QAction("Choose Folder")
+        self.choose_folder_action.setShortcut("Ctrl+O")
+        self.choose_folder_action.triggered.connect(self.choose_folder)
+
+        self.view_restart_button = QAction("Restart Button")
+        self.view_restart_button.setCheckable(True)
+        self.view_restart_button.setChecked(True)
+        self.view_restart_button.toggled.connect(self.toggle_restart_button_visibility)
+
+        self.view_folder_button = QAction("Folder Button")
+        self.view_folder_button.setCheckable(True)
+        self.view_folder_button.setChecked(True)
+        self.view_folder_button.toggled.connect(self.toggle_folder_button_visibility)
+
+        self.dark_theme_action = QAction("Dark Theme")
+        self.light_theme_action = QAction("Light Theme")
+        
+        self.themes_menu.addAction(self.dark_theme_action)
+        self.themes_menu.addAction(self.light_theme_action)
+
+        self.view_menu.addAction(self.view_restart_button)
+        self.view_menu.addAction(self.view_folder_button)
+
+        self.file_menu.addAction(self.choose_folder_action)
+
+
+
+    def toggle_restart_button_visibility(self, checked):
+        if checked:
+            self.restart_button.show()
+        else:
+            self.restart_button.hide()
+
+    def toggle_folder_button_visibility(self, checked):
+        if checked:
+            self.folder_button.show()
+        else:
+            self.folder_button.hide()
+
+
+    def save_personalized_options(self):
+        options_save_file = Path ("mahou_cache") / ("app_cache") / "user_settings.json"
+
+
     @log_delta_time
     def set_interface_aspect(self):
+        
         # * TÍTULO -------
         self.title = QLabel("Mahou no Ongaku")
         self.title.setObjectName("title")

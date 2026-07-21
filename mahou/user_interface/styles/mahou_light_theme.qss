@@ -218,6 +218,7 @@ QSlider::handle:horizontal:pressed {
 
 
 
+
 /* QMenuBar {
     background-color: #444444;
     font-family: "Bahnschrift";

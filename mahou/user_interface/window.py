@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QAction, QActionGroup
 from mahou_libs.time_functions import log_delta_time
 from pathlib import Path
-from mahou.core.enums import Themes, Paths
+from mahou.core.enums import Themes, Paths, Settings
 from mahou.user_interface.main_screen import MahouMainScreen
 from mahou import file_manager
 
@@ -121,23 +121,21 @@ class MahouInterface(QMainWindow):
 
         self.file_menu.addAction(self.choose_folder_action)
         
-    def set_view_menu(self):        
+    def set_view_menu(self):
+        options_dict = file_manager.read_file(Paths.SETTINGS_FILE)
+        view_options = options_dict.get(Settings.VIEW, {})
+
         self.view_restart_button = QAction("Restart Button")
         self.view_folder_button = QAction("Folder Button")
 
         self.view_restart_button.setCheckable(True)
         self.view_folder_button.setCheckable(True)
 
+        self.view_restart_button.setChecked(view_options.get(Settings.RESTART_BUTTON, True))
+        self.view_folder_button.setChecked(view_options.get(Settings.FOLDER_BUTTON, True))
+
         self.view_restart_button.toggled.connect(self.main_screen.toggle_restart_button_visibility)
         self.view_folder_button.toggled.connect(self.main_screen.toggle_folder_button_visibility)
-
-
-        if self.view_options_dict is not None:
-            self.view_restart_button.setChecked(self.view_options_dict["restart"])
-            self.view_folder_button.setChecked(self.view_options_dict["folder"])
-        else:
-            self.view_restart_button.setChecked(True)
-            self.view_folder_button.setChecked(True)
 
         
         self.view_menu.addAction(self.view_restart_button)

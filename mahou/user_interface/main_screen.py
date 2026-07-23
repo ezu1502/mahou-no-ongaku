@@ -7,7 +7,7 @@ from mahou_libs.time_functions import log_delta_time
 from mahou_libs.mahou_math import conversions
 from mahou.user_interface.player_bridge import PlayerBridge
 from mahou.core.song import Song
-from mahou.core.enums import PS, Paths, Themes
+from mahou.core.enums import PS, Paths, Themes, Settings
 from pathlib import Path
 import json
 from mahou import file_manager
@@ -330,26 +330,26 @@ class MahouMainScreen(QWidget):
         view_folder = self.main_window.view_folder_button.isChecked()
 
         view_options = {
-            "restart_button": view_restart,
-            "folder_button": view_folder,
+            Settings.RESTART_BUTTON: view_restart,
+            Settings.FOLDER_BUTTON: view_folder,
         }
 
-        file_manager.save_setting(view_options, "view")
+        file_manager.save_setting(view_options, Settings.VIEW)
 
     def load_view_options(self) -> None:
         option_dict = file_manager.read_file(Paths.SETTINGS_FILE)
 
-        view_options = option_dict.get("view", {}) #get vai tentar puxar um parametro e retorna o segundo se n achar
+        view_options = option_dict.get(Settings.VIEW, {}) #get vai tentar puxar um parametro e retorna o segundo se n achar
 
-        restart_visible = view_options.get("restart_button", True)
-        folder_visible = view_options.get("folder_button", True)
+        restart_visible = view_options.get(Settings.RESTART_BUTTON, True)
+        folder_visible = view_options.get(Settings.FOLDER_BUTTON, True)
 
         self.restart_button.setVisible(restart_visible)
         self.folder_button.setVisible(folder_visible)
 
         self.main_window.user_options_dict = {
-            "restart_button" : restart_visible,
-            "folder_button": folder_visible
+            Settings.RESTART_BUTTON: restart_visible,
+            Settings.FOLDER_BUTTON: folder_visible
         }
 
 

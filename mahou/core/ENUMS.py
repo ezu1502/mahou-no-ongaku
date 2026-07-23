@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 
 class PS(Enum):
@@ -17,4 +17,12 @@ class Themes(Enum):
 
 class Paths(Enum):
     SETTINGS_FILE = Path("mahou_files") / ("user_settings.json")
+
+
+class Settings(StrEnum):
+    DEFAULT_FOLDER = "default_folder"
     
+    VIEW = "view"
+
+    RESTART_BUTTON = "restart_button"
+    FOLDER_BUTTON = "folder_button"

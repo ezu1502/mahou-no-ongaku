@@ -7,37 +7,39 @@ from mahou_libs.time_functions import log_delta_time
 from mahou_libs.mahou_math import conversions
 from mahou.user_interface.player_bridge import PlayerBridge
 from mahou.core.song import Song
-from mahou.core.ENUMS import PS
+from mahou.core.enums import PS
 from pathlib import Path
 import json
-
-
 
 
 align = Qt.AlignmentFlag
 size_policy = QSizePolicy.Policy
 
-
 class MahouMainScreen(QWidget):
-    def __init__(self, main_window, app, player) -> None:
+    def __init__(self, main_window, app) -> None:
         super().__init__()
 
         self.main_window = main_window
         self.app = app
-        self.player = player
+
+        self.player = app.player
         self.bridge = PlayerBridge(window = self)
 
-        self.central_widget = QWidget()
+        self.playing_item = None
+
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(align.AlignTop)
-        self.central_widget.setLayout(self.main_layout)
+        self.setLayout(self.main_layout)
+
+        self.set_interface_aspect()
+        self.set_keyboard_shortcuts()
 
 
     def handle_duration_changed(self, duration):
-            self.progress_bar.setMaximum(duration)
-    
-            duration_string = conversions.seconds_to_base60(duration/1000)
-            self.duration_label.setText(f"{duration_string}")
+        self.progress_bar.setMaximum(duration)
+
+        duration_string = conversions.seconds_to_base60(duration/1000)
+        self.duration_label.setText(f"{duration_string}")
     
     def handle_position_changed(self, position): #esse acha a posição depois do usuario arrastar
         if not self.progress_bar.isSliderDown(): #IsSliderDown significa que o usuario ta segurando
@@ -53,8 +55,7 @@ class MahouMainScreen(QWidget):
         position = self.progress_bar.value()
         self.player.set_pos(position)
 
-    
-    def set_shortcuts(self):
+    def set_keyboard_shortcuts(self):
         self.toggle_key = QShortcut(QKeySequence("Space"), self)
         self.toggle_key.activated.connect(self.bridge.toggle)
 
@@ -64,13 +65,12 @@ class MahouMainScreen(QWidget):
 
         self.left_key = QShortcut(QKeySequence("Left"), self)
         self.left_key.activated.connect(lambda: self.bridge.change_song(-1))
-
+    
         self.right_key = QShortcut(QKeySequence("Right"), self)
         self.right_key.activated.connect(lambda: self.bridge.change_song(1))
 
         self.enter_key = QShortcut(QKeySequence("Return"), self)
         self.enter_key.activated.connect(self.bridge.load_and_play)
-
 
     def toggle_restart_button_visibility(self, checked):
         if checked:
@@ -89,19 +89,13 @@ class MahouMainScreen(QWidget):
         self.save_personalized_options()
         
 
-
     def save_personalized_options(self):
         options_save_file = Path ("mahou_cache") / ("app_cache") / "user_settings.json"
 
         options_save_file.parent.mkdir(parents = True, exist_ok = True)
 
-
-
         view_restart = self.main_window.view_restart_button.isChecked()
         view_folder = self.main_window.view_folder_button.isChecked()
-
-
-
 
         options = {
             "view restart": view_restart,
@@ -131,11 +125,6 @@ class MahouMainScreen(QWidget):
             "restart" : restart_visible,
             "folder": folder_visible
         }
-
-
-
-    
-            
 
 
     @log_delta_time
@@ -185,7 +174,7 @@ class MahouMainScreen(QWidget):
 
         self.play_pause_button = QPushButton("PLAY")
         self.play_pause_button.setFixedSize(300, 60)
-        self.play_pause_button.clicked.connect(self.bridge.toggle)
+        self.play_pause_button.pressed.connect(self.bridge.toggle)
         self.play_pause_button.setObjectName("play_button")
 
         self.right_panel.addWidget(self.play_pause_button, alignment = align.AlignHCenter)
@@ -404,8 +393,8 @@ class MahouMainScreen(QWidget):
                 self.restart_button.setEnabled(True)        
 
     def update_listbox_UI(self, new_item):
-        if self.main_window.playing_item is not None:
-            self.main_window.playing_item.setForeground(QBrush())
+        if self.playing_item is not None:
+            self.playing_item.setForeground(QBrush())
             
         
         new_item.setForeground(QColor("#FFC400"))
@@ -417,14 +406,14 @@ class MahouMainScreen(QWidget):
         item = selected_items[0] if selected_items else None  
         
         
-        self.play_selected_button.setEnabled(item is not self.main_window.playing_item and item is not None)
+        self.play_selected_button.setEnabled(item is not self.playing_item and item is not None)
 
 
     def reset_listbox_UI(self):
-        if self.main_window.playing_item is None:
+        if self.playing_item is None:
             return
         
-        self.main_window.playing_item.setForeground(QBrush())
+        self.playing_item.setForeground(QBrush())
 
     def song_list_length(self) -> int:
         return len(self.app.library.song_list)

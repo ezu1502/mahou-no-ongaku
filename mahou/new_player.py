@@ -3,9 +3,9 @@ from PySide6.QtCore import QObject, QUrl, Signal
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from mahou.core.song import Song
-from mahou.core.ENUMS import PS
+from mahou.core.enums import PS
 
-PlayerState =  QMediaPlayer.PlaybackState
+PlayerState = QMediaPlayer.PlaybackState
 
 class MahouPlayer(QObject):
     state_changed = Signal()

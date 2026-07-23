@@ -7,3 +7,9 @@ class PS(Enum):
     WELCOME_SCREEN = "welcome_screen"
     IN_MENU = "in_menu"
     SHUT_DOWN = "shut_down"
+
+class Themes(Enum):
+    MAIN = "main_theme"
+    LIGHT = "light_theme"
+    HABANERO = "habanero_theme"
+    

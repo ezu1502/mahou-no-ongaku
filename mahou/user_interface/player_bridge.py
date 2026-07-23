@@ -1,6 +1,8 @@
-from mahou.core.ENUMS import PS
+from mahou.core.enums import PS
 from PySide6.QtGui import QColor, QBrush
 from PySide6.QtCore import Qt
+from mahou_libs.time_functions import log_delta_time
+
 #region PLAYER CONTROLS
 class PlayerBridge:
     def __init__(self, window):
@@ -15,11 +17,7 @@ class PlayerBridge:
 
         self.no_need_to_load = False
 
-    
-
-
-
-
+    @log_delta_time
     def toggle(self):
         match self.get_state():
             case PS.PLAYING:
@@ -28,7 +26,7 @@ class PlayerBridge:
                 self.player.play_song()
             case PS.IN_MENU:
                 self.load_and_play()
-        # self.window.update_UI_by_state()
+
 
 
     def load_and_play(self, specific_item = None, play = True):

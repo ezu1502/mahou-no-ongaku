@@ -1,5 +1,5 @@
 from mahou.new_player import MahouPlayer
-from mahou.core.ENUMS import PS
+from mahou.core.enums import PS
 from mahou.user_interface.window import MahouInterface
 from mahou_libs.time_functions import log_delta_time, first_point, second_point
 from PySide6.QtWidgets import QApplication
@@ -16,17 +16,14 @@ class App:
 
         self.library = SongLibrary() #library
         folder = self.library.folder
+
         if folder is not None:
             self.library.set_song_list(folder) #song_list
         
-
-
         self.qt_app = QApplication(sys.argv) #qt app
+        self.player = MahouPlayer(app = self) #player
+        self.mahou_window = MahouInterface(app = self) #mainwindow
 
-        self.mahou_player = MahouPlayer(app = self) #player
-
-
-        self.mahou_window = MahouInterface(player = self.mahou_player, app = self) #mainwindow
         first = first_point()
 
         self.mahou_window.show()

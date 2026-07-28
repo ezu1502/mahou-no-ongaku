@@ -4,7 +4,7 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from mahou.core.song import Song
 from mahou.core.enums import PS
-
+from mahou_libs.time_functions import log_delta_time
 PlayerState = QMediaPlayer.PlaybackState
 
 class MahouPlayer(QObject):
@@ -60,7 +60,6 @@ class MahouPlayer(QObject):
 
 
 
-
     def load_song(self, song: Song):
         path = song.path.resolve()
         if not path.is_file():
@@ -83,5 +82,13 @@ class MahouPlayer(QObject):
     def stop_song(self):
         self.media_player.stop()
         self.media_player.setSource(QUrl())
+
+    def get_pos(self):
+        """ Returns posision in milliseconds """
+        return self.media_player.position()
+    
     def set_pos(self, position):
         self.media_player.setPosition(position)
+
+
+        

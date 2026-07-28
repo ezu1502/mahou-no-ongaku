@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QMainWindow, QSizePolicy)
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QAction, QActionGroup
+from PySide6.QtGui import QAction, QActionGroup, QCloseEvent
 from mahou_libs.time_functions import log_delta_time
 from pathlib import Path
 from mahou.core.enums import Themes, Paths, Settings
@@ -141,7 +141,6 @@ class MahouInterface(QMainWindow):
         self.view_menu.addAction(self.view_restart_button)
         self.view_menu.addAction(self.view_folder_button)
 
-
     def set_themes_menu(self):
         self.themes_group = QActionGroup(self)
 
@@ -203,4 +202,19 @@ class MahouInterface(QMainWindow):
                 self.setWindowTitle(f"{song_title} - MAHOU NO ONGAKU")
 
 
-    
+    def save_configs(self):
+        current_item = self.main_screen.playing_item
+        if current_item is not None:
+            position = self.player.get_pos()
+            current_song = current_item.data(Qt.ItemDataRole.UserRole).title
+            configs_dict = {
+                Settings.CURRENT_SONG : current_song,
+                Settings.SONG_POS : position,
+            }
+        file_manager.save_setting(configs_dict, "playing_configs")
+
+
+    def closeEvent(self, event: QCloseEvent):
+        self.save_configs()
+        print("Playing configs saved.\nClosing window...")
+        event.accept()

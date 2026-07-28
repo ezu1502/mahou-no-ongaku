@@ -9,6 +9,7 @@ class PlayerBridge:
         self.master = master
 
         self.player = self.master.player
+        
         self.player.state_changed.connect(self.master.update_UI_by_state)
         self.player.song_ended.connect(lambda: self.change_song(1))
 

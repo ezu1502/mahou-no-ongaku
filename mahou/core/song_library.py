@@ -7,15 +7,19 @@ from mahou_libs.bocca import BoccaFiglia
 from mahou.core.enums import Paths
 from mahou import file_manager
 
+import random
+import string
+
 log = BoccaFiglia("song_library", "#FF0000")
 
 class SongLibrary:
     def __init__(self) -> None:
         self.folder: Path | None = None
-        self.song_list: list[Song] = []
+
+        self.song_map: dict[str, Song] = {}
 
         default_folder = self.default_folder
-        if default_folder is not None and default_folder is not ".":
+        if default_folder is not None and default_folder != Path("."):
             self.set_folder(default_folder)
 
     @property
@@ -26,12 +30,10 @@ class SongLibrary:
 
         return Path(folder) if folder is not None else None
             
-
     def save_folder(self, folder):
         folder = str(folder)
 
         file_manager.save_setting(folder, "default_folder")
-
 
     def set_folder(self, folder: Path) -> None:
         if folder is None:
@@ -39,22 +41,38 @@ class SongLibrary:
             return None
         
         self.folder = folder
-        self.set_song_list(folder)
-        self.save_folder(folder)
-        
+        self.set_song_map(folder)
+        self.save_folder(folder) 
 
-    def set_song_list(self, folder: Path):
-        self.song_list.clear()
+    def set_song_map(self, folder: Path):
+        self.song_map = {}
 
         supported_formats = {".mp3", ".wav", ".ogg", ".m4a", ".flac"}
 
         for file_path in folder.iterdir():
             if file_path.is_file() and file_path.suffix.lower() in supported_formats:
-                song = Song(path = file_path)
-                self.song_list.append(song)
-    
-        self.song_list.sort(key = lambda song: song.title.lower())
-                
+
+                song_id = self.make_song_id()
+                self.song_map[song_id] = Song(path = file_path, id = song_id)
+           
         log.debug("song list set")
 
 
+    def make_song_id(self):
+        possible_chars = string.ascii_letters + string.digits
+
+        def roll_random_ids():
+            choices = random.choices(possible_chars, k = 8)
+            return  "".join(choices)
+
+        random_id = roll_random_ids()
+        
+        while random_id in self.song_map:
+            random_id = roll_random_ids()
+
+        song_id = random_id
+
+        return song_id
+
+    def get_song_from_id(self, id: str) -> Song | None:
+        return self.song_map.get(id, None)

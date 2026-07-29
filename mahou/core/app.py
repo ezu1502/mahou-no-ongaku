@@ -1,4 +1,4 @@
-from mahou.new_player import MahouPlayer
+from mahou.audio.player import MahouPlayer
 from mahou.core.enums import PS, Paths
 from mahou.user_interface.window import MahouInterface
 from mahou_libs.time_functions import log_delta_time, first_point, second_point
@@ -7,6 +7,7 @@ from mahou.core.song_library import SongLibrary
 import sys
 import time
 from mahou import file_manager as FM
+from mahou.database.song_database import SongDatabase
 
 
 class App:
@@ -14,11 +15,14 @@ class App:
     def __init__(self) -> None:
         self.state = PS.IN_MENU #DEFAULT STATE SET
 
+        self.song_database = SongDatabase()
+        self.song_database.initialize()
+
         self.library = SongLibrary() #library
         folder = self.library.folder
 
         if folder is not None:
-            self.library.set_song_list(folder) #song_list
+            self.library.set_song_map(folder) #song_list
         
         self.qt_app = QApplication(sys.argv) #qt app
         self.player = MahouPlayer(app = self) #player
@@ -45,7 +49,9 @@ class App:
     def set_library_folder(self, folder):
         self.library.set_folder(folder)
     
-    @property
-    def get_library_song_list(self):
-        return self.library.song_list
+
+    def get_library_song_map(self):
+        return self.library.song_map
     
+    def get_song_from_id(self, id: str):
+        return self.library.get_song_from_id(id)

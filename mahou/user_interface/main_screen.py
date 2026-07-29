@@ -318,7 +318,7 @@ class MahouMainScreen(QWidget):
 
         # * -------------
 
-        self.set_listbox_list(self.song_list)
+        self.set_listbox_list(self.song_map)
 
         # * ------------------------------
 
@@ -356,15 +356,15 @@ class MahouMainScreen(QWidget):
 #endregion
 #region LIST REGION
     @log_delta_time
-    def set_listbox_list(self, list_to_add: list[Song]):
-        if list_to_add is None:
+    def set_listbox_list(self, song_map: dict[str, Song]):
+        if song_map is None:
             return
         
         self.listbox.clear()
 
-        for item in list_to_add:
-            song_item = QListWidgetItem(item.title)
-            song_item.setData(Qt.ItemDataRole.UserRole, item)
+        for id, song in song_map.items():
+            song_item = QListWidgetItem(song.title)
+            song_item.setData(Qt.ItemDataRole.UserRole, id)
             self.listbox.addItem(song_item)
 
     def song_list_length(self) -> int:
@@ -383,15 +383,19 @@ class MahouMainScreen(QWidget):
         folder = Path(folder_string)
 
         self.app.set_library_folder(folder)
-        new_list = self.app.get_library_song_list
+        song_map = self.app.get_library_song_map
 
         self.bridge.stop_song()
 
-        self.set_listbox_list(new_list)
-    
+        self.set_listbox_list(song_map)
+
     @property
-    def song_list(self):
-        return self.app.library.song_list
+    def song_map(self) -> dict[str, Song]:
+        return self.app.library.song_map
+
+    def get_song_from_id(self, id):
+        return self.song_map.get(id, None)
+
 
 #endregion
 #region UI Update

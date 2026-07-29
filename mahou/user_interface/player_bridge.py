@@ -39,12 +39,13 @@ class PlayerBridge:
         else:
             item = specific_item
         
-       
-        song = item.data(Qt.ItemDataRole.UserRole)
+        song_id = item.data(Qt.ItemDataRole.UserRole)
   
-        if song is None:
+        if song_id is None:
             return
-    
+        
+        song = self.master.get_song_from_id(song_id)
+
         self.player.load_song(song)
         if play:
             self.player.play_song()
@@ -116,9 +117,6 @@ class PlayerBridge:
             case PS.PAUSED:
                 self.load_and_play(new_item)
                 self.player.pause_song()
-
-
-    
             
 #endregion
 #region UI Updating

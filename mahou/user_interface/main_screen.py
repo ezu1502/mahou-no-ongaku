@@ -368,7 +368,7 @@ class MahouMainScreen(QWidget):
             self.listbox.addItem(song_item)
 
     def song_map_length(self) -> int:
-        return len(self.app.library.song_map)
+        return len(self.app.song_map)
     
     def get_listbox_selection(self):
         selected_items = self.listbox.selectedItems()

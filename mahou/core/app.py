@@ -3,9 +3,7 @@ from mahou.core.enums import PS, Paths
 from mahou.user_interface.window import MahouInterface
 from mahou_libs.time_functions import TimeCounter
 from PySide6.QtWidgets import QApplication
-from mahou.core.song_library import SongLibrary
 import sys
-import time
 from mahou import file_manager as FM
 from mahou.database.song_database import SongDatabase
 from mahou.database.folder_scanner import FolderScanner

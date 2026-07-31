@@ -30,19 +30,16 @@ class SongDatabase:
         self.cursor.executescript(self.load_command(GeneralCommands.CREATE_TABLE))
         self.connection.commit()
 
-    def insert_song(self, song: Song, commit = True):
-        """ Coloca uma música no banco de dados. """
-        title = song.title
-        song_path = song.path
-
-        song_id = self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (title, str(song_path)))
+    def insert_new_song(self, song_path: Path, custom_title = None, commit = True):
+        if custom_title is None:
+            custom_title = song_path.stem
+        
+        self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (str(song_path), custom_title))
 
         if commit:
             self.commit()
             self.reset_song_map()
-
-        return song_id
-
+        
 
     def commit(self):
         self.connection.commit()

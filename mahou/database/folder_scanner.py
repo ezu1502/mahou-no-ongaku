@@ -15,6 +15,9 @@ class FolderScanner:
         self.database = database
 
     def scan_folder(self, folder: str | Path):
+        """ Escaneia uma pasta e adiciona as que não estiverem no database à tabela
+        """
+
         folder = Path(folder)
         if folder == Path(".") or not folder.is_dir():
             return

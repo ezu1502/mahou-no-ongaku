@@ -1,6 +1,6 @@
 #PYSIDE6 IMPORTS
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
-QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider)
+QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox)
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt
 from mahou_libs.time_functions import TimeCounter
@@ -191,9 +191,9 @@ class MahouMainScreen(QWidget):
         self.right_panel.addWidget(self.play_pause_button, alignment = align.AlignHCenter)
 
         # * FOLDER BUTTON ---
-        self.folder_button = QPushButton("Choose Folder")
+        self.folder_button = QPushButton("Scan Folder")
         self.folder_button.setFixedSize(300, 60)
-        self.folder_button.clicked.connect(self.choose_folder)
+        self.folder_button.clicked.connect(self.scan_folder)
         
         self.right_panel.addWidget(self.folder_button, alignment = align.AlignHCenter)
 
@@ -318,7 +318,7 @@ class MahouMainScreen(QWidget):
 
         # * -------------
 
-        self.set_listbox_list(self.song_map)
+        self.update_listbox_list(self.song_map)
 
         # * ------------------------------
 
@@ -356,11 +356,12 @@ class MahouMainScreen(QWidget):
 #endregion
 #region LIST REGION
     @TimeCounter
-    def set_listbox_list(self, song_map: dict[int, Song]):
+    def update_listbox_list(self, song_map: dict[int, Song], set_mode: bool = False):
         if song_map is None:
             return
-        
-        self.listbox.clear()
+
+        if set_mode:
+            self.listbox.clear()
 
         for song_id, song in song_map.items():
             song_item = QListWidgetItem(song.title)
@@ -375,7 +376,7 @@ class MahouMainScreen(QWidget):
         item = selected_items[0] if selected_items else None  
         return item
     
-    def choose_folder(self):
+    def scan_folder(self):
         folder_string = QFileDialog.getExistingDirectory(self, "Choose a folder")
         if not folder_string: 
             return
@@ -384,11 +385,31 @@ class MahouMainScreen(QWidget):
 
         self.app.scan_folder(folder)
 
-        self.set_listbox_list(self.song_map)
-     
+        self.handle_scanned_folder(folder)
+
+    def handle_scanned_folder(self, folder) -> None:
+        msg = QMessageBox()
+        msg.setWindowTitle("Mahou is asking:")
+        msg.setText(f"New songs were found from {folder}. Would you like to add them to the list "
+                    "or would you like to set the list?")
+
+        add = msg.addButton("Add", QMessageBox.ButtonRole.ActionRole)
+        set_button = msg.addButton("Set", QMessageBox.ButtonRole.ActionRole)
+        cancel = msg.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+
+        msg.exec()
+
+        clicked = msg.clickedButton()
+
+        if clicked == add:
+            self.update_listbox_list(self.song_map, set_mode = False)
+        elif clicked == set_button:
+            self.update_listbox_list(self.song_map, set_mode = True)
+        else:
+            return
+
         self.bridge.stop_song()
 
-        
 
     @property
     def song_map(self) -> dict[int, Song]:

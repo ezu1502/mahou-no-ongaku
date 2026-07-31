@@ -117,7 +117,7 @@ class MahouInterface(QMainWindow):
     def set_file_menu(self):
         self.choose_folder_action = QAction("Choose Folder")
         self.choose_folder_action.setShortcut("Ctrl+O")
-        self.choose_folder_action.triggered.connect(self.main_screen.choose_folder)
+        self.choose_folder_action.triggered.connect(self.main_screen.scan_folder)
 
         self.file_menu.addAction(self.choose_folder_action)
         

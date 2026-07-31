@@ -41,5 +41,7 @@ class App:
         # ! REFAZER
         ...
 
+    @property
     def song_map(self):
         return self.song_database.song_map
+

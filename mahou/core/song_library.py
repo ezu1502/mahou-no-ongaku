@@ -6,15 +6,17 @@ import json
 from mahou_libs.bocca import BoccaFiglia
 from mahou.core.enums import Paths
 from mahou import file_manager
-
+from mahou_libs.time_functions import TimeCounter
 import random
 import string
 
 log = BoccaFiglia("song_library", "#FF0000")
 
 class SongLibrary:
-    def __init__(self) -> None:
+    def __init__(self, app) -> None:
         self.folder: Path | None = None
+
+        self.app = app
 
         self.song_map: dict[str, Song] = {}
 
@@ -35,6 +37,7 @@ class SongLibrary:
 
         file_manager.save_setting(folder, "default_folder")
 
+    @TimeCounter
     def set_folder(self, folder: Path) -> None:
         if folder is None:
             log.warning("Exception: path is null")
@@ -76,3 +79,5 @@ class SongLibrary:
 
     def get_song_from_id(self, id: str) -> Song | None:
         return self.song_map.get(id, None)
+
+

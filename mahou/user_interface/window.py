@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (QMainWindow, QSizePolicy)
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QAction, QActionGroup, QCloseEvent
-from mahou_libs.time_functions import log_delta_time
+from mahou_libs.time_functions import TimeCounter
 from pathlib import Path
 from mahou.core.enums import Themes, Paths, Settings
 from mahou.user_interface.main_screen import MahouMainScreen
@@ -13,7 +13,7 @@ size_policy = QSizePolicy.Policy
 class MahouInterface(QMainWindow):
     theme_changed = Signal(Themes)
 
-    @log_delta_time
+    @TimeCounter
     def __init__(self, app):
         super().__init__()
         
@@ -204,14 +204,17 @@ class MahouInterface(QMainWindow):
 
     def save_configs(self):
         current_item = self.main_screen.playing_item
-        if current_item is not None:
-            position = self.player.get_pos()
-            song_id = current_item.data(Qt.ItemDataRole.UserRole)
-            current_song = self.app.get_song_from_id(song_id).title
-            configs_dict = {
-                Settings.CURRENT_SONG : current_song,
-                Settings.SONG_POS : position,
-            }
+        if current_item is None:
+            return
+        
+        position = self.player.get_pos()
+        song_id = current_item.data(Qt.ItemDataRole.UserRole)
+        current_song = self.app.get_song_from_id(song_id).title
+        configs_dict = {
+            Settings.CURRENT_SONG : current_song,
+            Settings.SONG_POS : position,
+        }
+
         file_manager.save_setting(configs_dict, "playing_configs")
 
 

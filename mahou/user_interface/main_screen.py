@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, Q
 QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider)
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt
-from mahou_libs.time_functions import log_delta_time
+from mahou_libs.time_functions import TimeCounter
 from mahou_libs.mahou_math import conversions
 from mahou.user_interface.player_bridge import PlayerBridge
 from mahou.core.song import Song
@@ -138,7 +138,7 @@ class MahouMainScreen(QWidget):
         self.enter_key = QShortcut(QKeySequence("Return"), self)
         self.enter_key.activated.connect(self.bridge.load_and_play)
 
-    @log_delta_time
+    @TimeCounter
     def set_interface_aspect(self):
         
         # * TÍTULO -------
@@ -355,7 +355,7 @@ class MahouMainScreen(QWidget):
 
 #endregion
 #region LIST REGION
-    @log_delta_time
+    @TimeCounter
     def set_listbox_list(self, song_map: dict[str, Song]):
         if song_map is None:
             return

@@ -1,7 +1,7 @@
 from mahou.core.enums import PS
 from PySide6.QtGui import QColor, QBrush
 from PySide6.QtCore import Qt
-from mahou_libs.time_functions import log_delta_time
+from mahou_libs.time_functions import TimeCounter
 
 #region PLAYER CONTROLS
 class PlayerBridge:
@@ -19,7 +19,7 @@ class PlayerBridge:
 
         self.no_need_to_load = False
 
-    @log_delta_time
+    @TimeCounter
     def toggle(self):
         match self.get_state():
             case PS.PLAYING:

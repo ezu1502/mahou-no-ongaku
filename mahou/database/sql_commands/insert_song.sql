@@ -1,4 +1,4 @@
 
-INSERT INTO song (path, title)
+INSERT INTO songs (path, title)
 VALUES (?, ?)
 ON CONFLICT(path) DO NOTHING;

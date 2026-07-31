@@ -36,8 +36,7 @@ class SongDatabase:
         if commit:
             self.commit()
        
-        
-
+    
     def commit(self):
         self.connection.commit()
 

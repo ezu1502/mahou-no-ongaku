@@ -368,14 +368,6 @@ class MahouMainScreen(QWidget):
             song_item.setData(Qt.ItemDataRole.UserRole, song_id)
             self.listbox.addItem(song_item)
 
-    def song_map_length(self) -> int:
-        return len(self.app.song_map)
-    
-    def get_listbox_selection(self):
-        selected_items = self.listbox.selectedItems()
-        item = selected_items[0] if selected_items else None  
-        return item
-    
     def scan_folder(self):
         folder_string = QFileDialog.getExistingDirectory(self, "Choose a folder")
         if not folder_string: 
@@ -386,7 +378,7 @@ class MahouMainScreen(QWidget):
         self.app.scan_folder(folder)
 
         self.handle_scanned_folder(folder)
-
+    
     def handle_scanned_folder(self, folder) -> None:
         msg = QMessageBox()
         msg.setWindowTitle("Mahou is asking:")
@@ -409,8 +401,16 @@ class MahouMainScreen(QWidget):
             return
 
         self.bridge.stop_song()
+ 
 
 
+    
+    def get_listbox_selection(self):
+        selected_items = self.listbox.selectedItems()
+        item = selected_items[0] if selected_items else None  
+        return item
+    
+    
     @property
     def song_map(self) -> dict[int, Song]:
         return self.app.song_map

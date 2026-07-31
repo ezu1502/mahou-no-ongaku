@@ -1,13 +1,15 @@
+import os
+os.environ["BOCCA_HIDE_GREETING"] = "1"
+
 from mahou_libs.time_functions import TimeCounter
 
 with TimeCounter("main.py imports"):
-    import os; os.environ["BOCCA_HIDE_GREETING"] = "1"
     os.environ["QT_LOGGING_RULES"] = "qt.multimedia.ffmpeg.*=false"
     os.environ.pop("QT_FFMPEG_DEBUG", None)
+    from mahou_libs import bocca
 
     from mahou_libs.colors import painted_string
     from mahou.core.app import App
-    from mahou_libs import bocca
 
 
 log = bocca.BoccaFiglia("main", "#FFAE00") 

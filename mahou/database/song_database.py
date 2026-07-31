@@ -10,11 +10,6 @@ log = BoccaFiglia("song_database", "#9191FF")
 
 # ! PADRÃO DO DATABASE: (id, path, title)
 
-class Keys(Enum):
-    ID = "id"
-    TITLE = "title"
-    PATH = "path"
-
 class SongDatabase:
     def __init__(self) -> None:
         self.connection = get_connection()
@@ -36,9 +31,11 @@ class SongDatabase:
         
         self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (str(song_path), custom_title))
 
+        self.reset_song_map()
+        
         if commit:
             self.commit()
-            self.reset_song_map()
+       
         
 
     def commit(self):
@@ -68,17 +65,16 @@ class SongDatabase:
         if result is None:
             return None
 
-        return self.tuple_to_song(result)
+        return self._tuple_to_song(result)
         
     @staticmethod
-    def tuple_to_song(song_tuple: tuple[int, str, str]) -> Song:
+    def _tuple_to_song(song_tuple: tuple[int, str, str]) -> Song:
         song_id, song_path, title = song_tuple
 
         return Song(id = song_id, path = Path(song_path), title_ = title)
     
     @property
     def song_map(self) -> dict[int, Song]:
-        #tupla vem em (id, path, title)
         """
         Retorna uma todas as músicas do banco de dados em ordem alfabética*
 
@@ -89,7 +85,6 @@ class SongDatabase:
         if self._song_map is not None:
             return self._song_map
 
-        
         command = self.load_command(SongCommands.SELECT_ALL)
         self.cursor.execute(command)
 
@@ -98,7 +93,7 @@ class SongDatabase:
         song_map: dict[int, Song] = {}
 
         for song_info in all_songs_list:
-            song = self.tuple_to_song(song_info)
+            song = self._tuple_to_song(song_info)
             song_map[song.id] = song
 
         self._song_map = song_map
@@ -108,4 +103,3 @@ class SongDatabase:
     def reset_song_map(self):
         self._song_map = None
 
-            

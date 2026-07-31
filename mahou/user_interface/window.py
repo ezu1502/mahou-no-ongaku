@@ -209,9 +209,8 @@ class MahouInterface(QMainWindow):
         
         position = self.player.get_pos()
         song_id = current_item.data(Qt.ItemDataRole.UserRole)
-        current_song = self.app.get_song_from_id(song_id).title
         configs_dict = {
-            Settings.CURRENT_SONG : current_song,
+            Settings.CURRENT_SONG : song_id,
             Settings.SONG_POS : position,
         }
 

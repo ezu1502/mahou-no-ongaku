@@ -9,6 +9,7 @@ import time
 from mahou import file_manager as FM
 from mahou.database.song_database import SongDatabase
 from mahou.database.folder_scanner import FolderScanner
+from pathlib import Path
 
 class App:
     @TimeCounter
@@ -20,12 +21,6 @@ class App:
 
         self.folder_scanner = FolderScanner(database = self.song_database)
 
-        self.library = SongLibrary(app = self) #library
-        folder = self.library.folder
-
-        if folder is not None:
-            self.library.set_song_map(folder) #song_list
-        
         self.qt_app = QApplication(sys.argv) #qt app
         self.player = MahouPlayer(app = self) #player
         self.mahou_window = MahouInterface(app = self) #mainwindow
@@ -41,13 +36,12 @@ class App:
     def set_state(self, state: PS) -> None:
         self.state = state
 
-    
-    def set_library_folder(self, folder):
-        self.library.set_folder(folder)
-    
-
-    def get_library_song_map(self):
-        return self.library.song_map
+    def scan_folder(self, folder: Path):
+        return self.folder_scanner.scan_folder(folder)
     
     def get_song_from_id(self, id: str):
-        return self.library.get_song_from_id(id)
+        # ! REFAZER
+        ...
+
+    def song_map(self):
+        return self.song_database.song_map

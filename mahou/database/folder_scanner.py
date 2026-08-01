@@ -29,8 +29,7 @@ class FolderScanner:
             if path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS:
                 self.database.insert_new_song(song_path = path, commit = False)
                 valid_song_paths += 1
-                #! CONTINUAR DAQUI !!!!!!!! -> Vai fazer uma lista com os IDs das músicas recém adicionadas
-
+                
         self.database.commit()
         self.database.reset_song_map()
 

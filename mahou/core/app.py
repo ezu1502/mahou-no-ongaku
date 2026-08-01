@@ -1,38 +1,31 @@
-from mahou.new_player import MahouPlayer
+from mahou.audio.player import MahouPlayer
 from mahou.core.enums import PS, Paths
 from mahou.user_interface.window import MahouInterface
-from mahou_libs.time_functions import log_delta_time, first_point, second_point
+from mahou_libs.time_functions import TimeCounter
 from PySide6.QtWidgets import QApplication
-from mahou.core.song_library import SongLibrary
 import sys
-import time
 from mahou import file_manager as FM
-
+from mahou.database.song_database import SongDatabase
+from mahou.database.folder_scanner import FolderScanner
+from pathlib import Path
 
 class App:
-    @log_delta_time
+    @TimeCounter
     def __init__(self) -> None:
         self.state = PS.IN_MENU #DEFAULT STATE SET
-
-        self.library = SongLibrary() #library
-        folder = self.library.folder
-
-        if folder is not None:
-            self.library.set_song_list(folder) #song_list
         
+        self.song_database = SongDatabase()
+        self.song_database.initialize()
+
+        self.folder_scanner = FolderScanner(database = self.song_database)
+
         self.qt_app = QApplication(sys.argv) #qt app
         self.player = MahouPlayer(app = self) #player
         self.mahou_window = MahouInterface(app = self) #mainwindow
 
-        first = first_point()
-
         self.mahou_window.show()
 
-        second_point(first)
-
-
-        
-
+      
         
     def run(self):
         self.qt_app.exec()
@@ -41,11 +34,14 @@ class App:
     def set_state(self, state: PS) -> None:
         self.state = state
 
+    def scan_folder(self, folder: Path):
+        return self.folder_scanner.scan_folder(folder)
     
-    def set_library_folder(self, folder):
-        self.library.set_folder(folder)
-    
+    def get_song_from_id(self, id: str):
+        # ! REFAZER
+        ...
+
     @property
-    def get_library_song_list(self):
-        return self.library.song_list
-    
+    def song_map(self):
+        return self.song_database.song_map
+

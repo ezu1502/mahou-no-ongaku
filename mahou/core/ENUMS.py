@@ -18,6 +18,8 @@ class Themes(Enum):
 class Paths(Enum):
     SETTINGS_FILE = Path("mahou_files") / ("user_settings.json")
 
+    DATABASE = Path("mahou_files") / ("database") / ("mahou_data.db")
+
 
 class Settings(StrEnum):
     DEFAULT_FOLDER = "default_folder"

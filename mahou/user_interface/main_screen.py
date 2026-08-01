@@ -1,9 +1,9 @@
 #PYSIDE6 IMPORTS
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
-QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider)
+QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox)
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt
-from mahou_libs.time_functions import log_delta_time
+from mahou_libs.time_functions import TimeCounter
 from mahou_libs.mahou_math import conversions
 from mahou.user_interface.player_bridge import PlayerBridge
 from mahou.core.song import Song
@@ -138,7 +138,7 @@ class MahouMainScreen(QWidget):
         self.enter_key = QShortcut(QKeySequence("Return"), self)
         self.enter_key.activated.connect(self.bridge.load_and_play)
 
-    @log_delta_time
+    @TimeCounter
     def set_interface_aspect(self):
         
         # * TÍTULO -------
@@ -191,9 +191,9 @@ class MahouMainScreen(QWidget):
         self.right_panel.addWidget(self.play_pause_button, alignment = align.AlignHCenter)
 
         # * FOLDER BUTTON ---
-        self.folder_button = QPushButton("Choose Folder")
+        self.folder_button = QPushButton("Scan Folder")
         self.folder_button.setFixedSize(300, 60)
-        self.folder_button.clicked.connect(self.choose_folder)
+        self.folder_button.clicked.connect(self.scan_folder)
         
         self.right_panel.addWidget(self.folder_button, alignment = align.AlignHCenter)
 
@@ -318,7 +318,7 @@ class MahouMainScreen(QWidget):
 
         # * -------------
 
-        self.set_listbox_list(self.song_list)
+        self.update_listbox_list(self.song_map)
 
         # * ------------------------------
 
@@ -355,43 +355,69 @@ class MahouMainScreen(QWidget):
 
 #endregion
 #region LIST REGION
-    @log_delta_time
-    def set_listbox_list(self, list_to_add: list[Song]):
-        if list_to_add is None:
+    @TimeCounter
+    def update_listbox_list(self, song_map: dict[int, Song], set_mode: bool = False):
+        if song_map is None:
             return
-        
-        self.listbox.clear()
 
-        for item in list_to_add:
-            song_item = QListWidgetItem(item.title)
-            song_item.setData(Qt.ItemDataRole.UserRole, item)
+        if set_mode:
+            self.listbox.clear()
+
+        for song_id, song in song_map.items():
+            song_item = QListWidgetItem(song.title)
+            song_item.setData(Qt.ItemDataRole.UserRole, song_id)
             self.listbox.addItem(song_item)
 
-    def song_list_length(self) -> int:
-        return len(self.app.library.song_list)
-    
-    def get_listbox_selection(self):
-        selected_items = self.listbox.selectedItems()
-        item = selected_items[0] if selected_items else None  
-        return item
-    
-    def choose_folder(self):
+    def scan_folder(self):
         folder_string = QFileDialog.getExistingDirectory(self, "Choose a folder")
         if not folder_string: 
             return
         
         folder = Path(folder_string)
 
-        self.app.set_library_folder(folder)
-        new_list = self.app.get_library_song_list
+        self.app.scan_folder(folder)
+
+        self.handle_scanned_folder(folder)
+    
+    def handle_scanned_folder(self, folder) -> None:
+        msg = QMessageBox()
+        msg.setWindowTitle("Mahou is asking:")
+        msg.setText(f"New songs were found from {folder}. Would you like to add them to the list "
+                    "or would you like to set the list?")
+
+        add = msg.addButton("Add", QMessageBox.ButtonRole.ActionRole)
+        set_button = msg.addButton("Set", QMessageBox.ButtonRole.ActionRole)
+        cancel = msg.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+
+        msg.exec()
+
+        clicked = msg.clickedButton()
+
+        if clicked == add:
+            self.update_listbox_list(self.song_map, set_mode = False)
+        elif clicked == set_button:
+            self.update_listbox_list(self.song_map, set_mode = True)
+        else:
+            return
 
         self.bridge.stop_song()
+ 
 
-        self.set_listbox_list(new_list)
+
+    
+    def get_listbox_selection(self):
+        selected_items = self.listbox.selectedItems()
+        item = selected_items[0] if selected_items else None  
+        return item
+    
     
     @property
-    def song_list(self):
-        return self.app.library.song_list
+    def song_map(self) -> dict[int, Song]:
+        return self.app.song_map
+
+    def get_song_from_id(self, song_id):
+        return self.song_map.get(song_id, None)
+
 
 #endregion
 #region UI Update
@@ -450,7 +476,6 @@ class MahouMainScreen(QWidget):
 
     def see_item(self, item) -> None:
         self.listbox.scrollToItem(item)
-
 
 #region state
     def get_state(self) -> PS:

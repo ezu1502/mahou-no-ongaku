@@ -4,7 +4,7 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from mahou.core.song import Song
 from mahou.core.enums import PS
-from mahou_libs.time_functions import log_delta_time
+from mahou_libs.time_functions import TimeCounter
 PlayerState = QMediaPlayer.PlaybackState
 
 class MahouPlayer(QObject):

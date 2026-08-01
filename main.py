@@ -1,10 +1,16 @@
-import os; os.environ["BOCCA_HIDE_GREETING"] = "1"
-os.environ["QT_LOGGING_RULES"] = "qt.multimedia.ffmpeg.*=false"
-os.environ.pop("QT_FFMPEG_DEBUG", None)
+import os
+os.environ["BOCCA_HIDE_GREETING"] = "1"
 
-from mahou_libs.colors import painted_string
-from mahou.core.app import App
-from mahou_libs import bocca
+from mahou_libs.time_functions import TimeCounter
+
+with TimeCounter("main.py imports"):
+    os.environ["QT_LOGGING_RULES"] = "qt.multimedia.ffmpeg.*=false"
+    os.environ.pop("QT_FFMPEG_DEBUG", None)
+    from mahou_libs import bocca
+
+    from mahou_libs.colors import painted_string
+    from mahou.core.app import App
+
 
 log = bocca.BoccaFiglia("main", "#FFAE00") 
 bocca.configure_default_settings()

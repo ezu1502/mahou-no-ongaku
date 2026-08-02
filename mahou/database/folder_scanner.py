@@ -14,24 +14,24 @@ class FolderScanner:
     def __init__(self, database:SongDatabase):
         self.database = database
 
-    def scan_folder(self, folder: str | Path) -> int | None:
-        """ Escaneia uma pasta e adiciona as que não estiverem no database à tabela.\n
-        Retorna o número de músicas analisadas
+    def scan_folder(self, folder: str | Path) -> list | None:
+        """ Retorna o número de músicas analisadas
         """
-
-        added_songs = []
 
         folder = Path(folder)
         if folder == Path(".") or not folder.is_dir():
             return
 
+        songs = []
         for path in folder.iterdir():
             if path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS:
-                self.database.insert_new_song(song_path = path, commit = False)
-                valid_song_paths += 1
+                song = self.database.get_or_create_song(song_path = path, commit = False) #esse método retorna songs
+                if song is not None:
+                    songs.append(song)
+            
                 
         self.database.commit()
         self.database.reset_song_map()
 
-        return valid_song_paths
+        return songs
         

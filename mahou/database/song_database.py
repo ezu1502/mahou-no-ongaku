@@ -25,17 +25,26 @@ class SongDatabase:
         self.cursor.executescript(self.load_command(GeneralCommands.CREATE_TABLE))
         self.connection.commit()
 
-    def insert_new_song(self, song_path: Path, custom_title = None, commit = True):
+    def check_song_exists(self, song_path) -> bool:
+        
+        self.cursor.execute(self.load_command(SongCommands.CHECK_EXISTS), (str(song_path),))
+        return self.cursor.fetchone() is not None
+
+    def get_or_create_song(self, song_path: Path, custom_title: str | None = None, commit: bool = True) -> Song | None:
+        """ Adiciona uma música ao database se ela não estiver lá. Retorna essa música também no formato Song """
         if custom_title is None:
             custom_title = song_path.stem
-        
-        self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (str(song_path), custom_title))
 
-        self.reset_song_map()
-        
-        if commit:
-            self.commit()
-       
+        if not self.check_song_exists(song_path):
+            self.insert_song(song_path, custom_title)
+            self.reset_song_map()
+            if commit:
+                self.commit()
+
+        return self.search_song_by_path(song_path)
+
+    def insert_song(self, song_path, song_title):
+        self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (str(song_path), song_title))
     
     def commit(self):
         self.connection.commit()

@@ -357,6 +357,7 @@ class MahouMainScreen(QWidget):
 #region LIST REGION
     @TimeCounter
     def update_listbox_list(self, song_map: dict[int, Song], set_mode: bool = False):
+        """ Precisa de um dict id : Song """
         if song_map is None:
             return
 
@@ -369,17 +370,20 @@ class MahouMainScreen(QWidget):
             self.listbox.addItem(song_item)
 
     def scan_folder(self):
+        """ Folder_scanner -> App -> Main_screen """
         folder_string = QFileDialog.getExistingDirectory(self, "Choose a folder")
         if not folder_string: 
             return
         
         folder = Path(folder_string)
 
-        self.app.scan_folder(folder)
+        songs_scanned = self.app.scan_folder(folder)
 
-        self.handle_scanned_folder(folder)
+        songs_scanned = {song.id: song for song in songs_scanned}
+
+        self.handle_scanned_folder(folder, songs_scanned)
     
-    def handle_scanned_folder(self, folder) -> None:
+    def handle_scanned_folder(self, folder: Path, scanned_songs: dict[int, Song]) -> None:
         msg = QMessageBox()
         msg.setWindowTitle("Mahou is asking:")
         msg.setText(f"New songs were found from {folder}. Would you like to add them to the list "
@@ -394,9 +398,9 @@ class MahouMainScreen(QWidget):
         clicked = msg.clickedButton()
 
         if clicked == add:
-            self.update_listbox_list(self.song_map, set_mode = False)
+            self.update_listbox_list(scanned_songs, set_mode = False)
         elif clicked == set_button:
-            self.update_listbox_list(self.song_map, set_mode = True)
+            self.update_listbox_list(scanned_songs, set_mode = True)
         else:
             return
 

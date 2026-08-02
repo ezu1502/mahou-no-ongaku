@@ -392,6 +392,26 @@ class MahouMainScreen(QWidget):
         set_button = msg.addButton("Set", QMessageBox.ButtonRole.ActionRole)
         cancel = msg.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
 
+        """ def apply_theme(msg, theme):
+                match theme:
+                    case Themes.DARK:
+                        style_path = Path(__file__).parent / "styles" / "dark_theme.qss"
+                    case Themes.LIGHT:
+                        style_path = Path(__file__).parent / "styles" / "light_theme.qss"
+                    case Themes.HABANERO:
+                        style_path = Path(__file__).parent / "styles" / "habanero_theme.qss"
+                    case _:
+                        style_path = Path(__file__).parent / "styles" / "dark_theme.qss"
+        
+                stylesheet_string = msg.load_stylesheet_string(style_path)
+                if isinstance(style_path, str):
+                    style_path = Path(style_path)
+                
+                    return style_path.read_text(encoding = "utf-8")
+                self.setStyleSheet(stylesheet_string)
+
+        msg.setStyleSheet() """
+
         msg.exec()
 
         clicked = msg.clickedButton()

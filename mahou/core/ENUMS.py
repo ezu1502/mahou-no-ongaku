@@ -29,5 +29,5 @@ class Settings(StrEnum):
     RESTART_BUTTON = "restart_button"
     FOLDER_BUTTON = "folder_button"
 
-    CURRENT_SONG = "current_song"
+    CURRENT_SONG_ID = "current_song"
     SONG_POS = "song_pos"

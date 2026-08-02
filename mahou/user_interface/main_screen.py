@@ -12,6 +12,7 @@ from pathlib import Path
 import json
 from mahou import file_manager
 
+
 align = Qt.AlignmentFlag
 size_policy = QSizePolicy.Policy
 
@@ -20,8 +21,6 @@ HIGHLIGHT_COLORS = {
     Themes.LIGHT: "#7F00D3",
     Themes.HABANERO: "#EF3300"
 }
-
-
 
 class MahouMainScreen(QWidget):
     def __init__(self, main_window, app) -> None:
@@ -352,7 +351,7 @@ class MahouMainScreen(QWidget):
             Settings.FOLDER_BUTTON: folder_visible
         }
 
-
+    
 #endregion
 #region LIST REGION
     @TimeCounter

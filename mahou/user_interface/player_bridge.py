@@ -62,9 +62,6 @@ class PlayerBridge:
         self.show_now_playing(song_title)
         self.set_window_title(song_title = song_title)
 
-        # if self.master.position_label.isHidden() or self.master.duration_label.isHidden():
-        #     self.master.position_label.show()
-        #     self.master.duration_label.show()   
 
 
     def play_selected(self):

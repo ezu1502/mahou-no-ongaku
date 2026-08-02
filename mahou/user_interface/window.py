@@ -26,7 +26,7 @@ class MahouInterface(QMainWindow):
         WINDOW_WIDTH, WINDOW_HEIGHT = 900, 600
 
         self.setWindowTitle(self.WINDOW_TITLE)
-        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+        self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.current_theme = self.get_theme_from_options()
 
@@ -210,7 +210,7 @@ class MahouInterface(QMainWindow):
         position = self.player.get_pos()
         song_id = current_item.data(Qt.ItemDataRole.UserRole)
         configs_dict = {
-            Settings.CURRENT_SONG : song_id,
+            Settings.CURRENT_SONG_ID : song_id,
             Settings.SONG_POS : position,
         }
 

@@ -1,6 +1,6 @@
 #PYSIDE6 IMPORTS
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
-QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox)
+QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox, QLineEdit)
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt
 from mahou_libs.time_functions import TimeCounter
@@ -150,6 +150,15 @@ class MahouMainScreen(QWidget):
         self.main_layout.addLayout(self.middle_layout, 14)
         
         # * LISTBOX ---
+        self.search_and_listbox_widget = QWidget()
+        self.search_and_listbox_layout = QVBoxLayout()
+        self.search_and_listbox_widget.setLayout(self.search_and_listbox_layout)
+
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText("Search song...")
+        self.search_bar.textChanged.connect(self.on_search)
+
+        self.search_and_listbox_layout.addWidget(self.search_bar)
 
         self.listbox = QListWidget()
         self.listbox.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -157,7 +166,8 @@ class MahouMainScreen(QWidget):
         self.listbox.setUniformItemSizes(True)
         self.listbox.itemSelectionChanged.connect(self.manage_play_selected_button)
 
-        self.middle_layout.addWidget(self.listbox, 9)
+        self.search_and_listbox_layout.addWidget(self.listbox)
+        self.middle_layout.addWidget(self.search_and_listbox_widget, 9)
     
         # * RIGHT PANEL/
         
@@ -322,6 +332,22 @@ class MahouMainScreen(QWidget):
         # * ------------------------------
 
 #endregion
+
+    def on_search(self, search):
+        if not search:
+            self.update_listbox_list(self.song_map, set_mode = True)
+
+
+        filtered = {song_id : song for song_id, song in self.song_map.items()
+                         if search.lower() in song.title.lower()}
+
+        ordered = dict(sorted(filtered.items(), key = lambda item:(
+            item[1].title.lower().find(search.lower()),
+            item[1].title.lower()
+        )))
+        self.update_listbox_list(ordered, set_mode = True)
+
+        
 #region SAVE/LOAD options
 
     def save_view_options(self) -> None:

@@ -47,3 +47,5 @@ class App:
 
     def set_stylesheet(self, stylesheet_string):
         self.qt_app.setStyleSheet(stylesheet_string)
+
+    

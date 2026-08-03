@@ -252,3 +252,53 @@ QMenu {
 QMenu::item:selected {
     background-color: #555555;
 }
+
+
+QMessageBox {
+    background-color: qlineargradient(
+        x1:0, y1:0,
+        x2:0, y2:1,
+
+        stop:0 #141414,
+        stop:1 #0a0a0a
+    )
+}
+
+QMessageBox QLabel {
+    color: #EEEEEE;
+    font-family: "Bahnschrift";
+    font-size: 12px;
+    padding: 3px;
+}
+
+QMessageBox QPushButton {
+    background-color: #090909;
+    color: #EEEEEE;
+
+    border-top: 1px solid #4A4A4A;
+    border-left: 1px solid #404040;
+    border-bottom: 1px solid #000000;
+    border-right: 1px solid #000000;
+
+
+    border-radius: 3;
+    font-family: "Bahnschrift";
+    font-size: 14px;
+    outline: none;
+    padding: 5px;
+
+    min-width: 45px;
+    min-height: 15px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #111111;
+}
+
+QMessageBox QPushButton:pressed {
+    background-color: #333333;
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #4A4A4A;
+    border-right: 1px solid #404040;
+}

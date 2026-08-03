@@ -45,3 +45,5 @@ class App:
     def song_map(self):
         return self.song_database.song_map
 
+    def set_stylesheet(self, stylesheet_string):
+        self.qt_app.setStyleSheet(stylesheet_string)

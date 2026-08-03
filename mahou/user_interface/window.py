@@ -80,7 +80,7 @@ class MahouInterface(QMainWindow):
                 style_path = Path(__file__).parent / "styles" / "dark_theme.qss"
 
         stylesheet_string = self.load_stylesheet_string(style_path)
-        self.setStyleSheet(stylesheet_string)
+        self.app.set_stylesheet(stylesheet_string)
   
     def set_theme(self, theme: Themes = Themes.DARK, first_time = False):
         if theme == self.current_theme and not first_time:

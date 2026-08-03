@@ -332,7 +332,7 @@ class MahouMainScreen(QWidget):
         # * ------------------------------
 
 #endregion
-
+    # @TimeCounter("Search Action")
     def on_search(self, search):
         if not search:
             self.update_listbox_list(self.song_map, set_mode = True)

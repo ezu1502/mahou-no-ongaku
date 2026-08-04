@@ -9,28 +9,35 @@ import time
 
 class SongTimer:
     def __init__(self) -> None:
-        self.initial_time = time.monotonic()
-        self._end_time = None
+        self._accumulated = 0
+        self.total_time = None
 
-    def end_time(self):
-        if self._end_time is None:
-            return self.elapsed_until_now()
-        else:
-            return self._end_time
+        self.last_start = None
+        self.stopped = False
+
+        self.play()
+
+    def play(self):
+        if self.stopped:
+            raise RuntimeError("Timer instance already stopped cannot be called again")
         
-    def elapsed_until_now(self):
-        return time.monotonic() - self.initial_time
+        if self.last_start is None:
+            self.last_start = time.monotonic()
+
+    def pause(self):
+        if self.last_start is None:
+            return
+        now = time.monotonic()
+        delta = now - self.last_start
+
+        self.last_start = None
+        self._accumulated += delta
 
     def stop(self):
-        self._end_time = time.monotonic()
-        self.elapsed_time = self.end_time - self.initial_time
+        self.pause()
+        self.stopped = True
 
-
-
-
-
-
-
+        return self._accumulated
 
 
 
@@ -47,6 +54,7 @@ class MahouPlayer(QObject):
         super().__init__()
 
         self.app = app
+        self.loaded_song = None
 
         self.media_player = QMediaPlayer(self)
         self.audio_output = QAudioOutput(self)
@@ -56,6 +64,7 @@ class MahouPlayer(QObject):
         self.connect_signals()
 
         self.playing_song = None
+        self.timer = None
 
     def connect_signals(self):
         self.media_player.playbackStateChanged.connect(self.handle_playback_state) #Estado do playback mudou
@@ -89,10 +98,16 @@ class MahouPlayer(QObject):
 
 
     def load_song(self, song: Song):
+        self.stop_timer()
+
+        # ! CONTINUAR AQUI, FUNÇÃO DE ANOTAR TEMPO DE MÚSICA OUVIDO
+
+        self.timer = None
         path = song.path.resolve()
         if not path.is_file():
             raise FileNotFoundError(f"Song path {path} does not exist or is not a valid song path")
-        
+
+        self.loaded_song = song
         self.playing_song = song
         
         path_url = QUrl.fromLocalFile(str(path))
@@ -102,12 +117,25 @@ class MahouPlayer(QObject):
     def play_song(self):
         self.media_player.play()
 
+        if self.timer is None:
+            self.timer = SongTimer()
+        else:
+            self.timer.play()
+
     def pause_song(self):
         self.media_player.pause()
+        if self.timer is not None:
+            self.timer.pause()
 
     def stop_song(self):
+        if self.timer is not None:
+            total = self.timer.stop()
+            self.timer = None
+
         self.media_player.stop()
         self.media_player.setSource(QUrl())
+
+        
 
     def get_pos(self):
         """ Returns posision in milliseconds """
@@ -116,6 +144,13 @@ class MahouPlayer(QObject):
     def set_pos(self, position):
         self.media_player.setPosition(position)
 
+
+    def stop_timer(self):
+        if self.timer is not None:
+            total_time = self.timer.stop()
+
+        if total_time >= 30:
+            self.song_was_listened.emit()
 
 
 

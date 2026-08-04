@@ -5,10 +5,10 @@ from mahou_libs.bocca import BoccaFiglia
 from mahou_libs.time_functions import TimeCounter
 from mahou.core.song import Song
 from mahou.database.command_enums import SongCommands, GeneralCommands
-
+import sqlite3
 log = BoccaFiglia("song_database", "#9191FF")
 
-# ! PADRÃO DO DATABASE: (id, path, title)
+# ! PADRÃO DO DATABASE: id, path, title, play_count, listen_time
 
 class SongDatabase:
     def __init__(self) -> None:
@@ -76,10 +76,14 @@ class SongDatabase:
         ...
 
     @staticmethod
-    def _row_to_song(song_tuple: tuple[int, str, str, int, float]) -> Song:
-        song_id, song_path, title, play_count, listen_time = song_tuple
-
-        return Song(id = song_id, path = Path(song_path), title_ = title, play_count = play_count, listen_time = listen_time)
+    def _row_to_song(row: sqlite3.Row) -> Song:
+        return Song(
+            id = row["id"],
+            path = Path(row["path"]),
+            title_ = row["title"],
+            play_count = row["play_count"],
+            listen_time = row["listen_time"],
+        )
     
     @property
     def song_map(self) -> dict[int, Song]:
@@ -100,8 +104,8 @@ class SongDatabase:
 
         song_map: dict[int, Song] = {}
 
-        for song_info in all_songs_list:
-            song = self._row_to_song(song_info)
+        for song_row in all_songs_list:
+            song = self._row_to_song(song_row)
             song_map[song.id] = song
 
         self._song_map = song_map
@@ -110,7 +114,6 @@ class SongDatabase:
 
     def reset_song_map(self):
         self._song_map = None
-
 
     def increment_song_play_count(self, song_id):
         """ Recebe um ID de uma música e incrementa o play_count dela"""

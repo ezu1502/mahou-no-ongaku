@@ -334,6 +334,9 @@ class MahouMainScreen(QWidget):
 #endregion
     # @TimeCounter("Search Action")
     def on_search(self, search):
+
+    # * CONTINUAR DAQUI! CRIAR UM MÉTODO QUE ORDENA O SONG MAP SOZINHO
+    
         if not search:
             self.update_listbox_list(self.song_map, set_mode = True)
 

@@ -1,5 +1,5 @@
 
-SELECT id, path, title
+SELECT *
 FROM songs
 ORDER BY title COLLATE NOCASE;
 

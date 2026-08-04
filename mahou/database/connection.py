@@ -8,4 +8,6 @@ database_path = Paths.DATABASE.value
 
 def get_connection():
     database_path.parent.mkdir(parents = True, exist_ok= True)
-    return sqlite3.connect(database_path)
+    connection = sqlite3.connect(database_path)
+    connection.row_factory = sqlite3.Row
+    return connection

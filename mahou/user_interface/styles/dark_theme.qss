@@ -302,3 +302,22 @@ QMessageBox QPushButton:pressed {
     border-bottom: 1px solid #4A4A4A;
     border-right: 1px solid #404040;
 }
+
+QLineEdit {
+    background-color: #131313;
+
+    
+    border-top: 1px solid #484848;
+    border-left: 1px solid #444444;
+    border-bottom: 1px solid #020202;
+    border-right: 1px solid #020202;
+
+    border-radius: 2px;
+
+    color: #EEEEEE;
+    font-family: "Segoe UI";
+    font-size: 13px;
+    min-height: 25px;
+
+    padding: 0px 3px;
+}

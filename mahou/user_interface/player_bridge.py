@@ -101,6 +101,8 @@ class PlayerBridge:
             return
         
         current_index = self.master.listbox.row(self.master.playing_item)
+
+        print(current_index)
         new_index = (current_index + change) % item_count
 
         new_item = self.master.listbox.item(new_index)

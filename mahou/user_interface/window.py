@@ -137,6 +137,8 @@ class MahouInterface(QMainWindow):
 
 
     def closeEvent(self, event: QCloseEvent):
+        self.main_screen.bridge.stop_song()
+        
         self.save_configs()
         print("Playing configs saved.\nClosing window...")
         event.accept()

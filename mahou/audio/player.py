@@ -10,13 +10,20 @@ import time
 class SongTimer:
     def __init__(self) -> None:
         self._accumulated = 0
-        self.total_time = None
 
         self.last_start = None
         self.stopped = False
 
         self.play()
 
+    def elapsed(self):
+        total = self._accumulated
+        if self.last_start is not None:
+            total += time.monotonic() - self.last_start
+        
+
+        return total
+    
     def play(self):
         if self.stopped:
             raise RuntimeError("Timer instance already stopped cannot be called again")
@@ -27,19 +34,19 @@ class SongTimer:
     def pause(self):
         if self.last_start is None:
             return
-        now = time.monotonic()
-        delta = now - self.last_start
 
+        self._accumulated = self.elapsed()
+       
         self.last_start = None
-        self._accumulated += delta
 
     def stop(self):
+        if self.stopped:
+            raise RuntimeError("Timer already stopped!")
+        
         self.pause()
         self.stopped = True
 
         return self._accumulated
-
-
 
 class MahouPlayer(QObject):
     state_changed = Signal()
@@ -48,7 +55,7 @@ class MahouPlayer(QObject):
     position_changed = Signal(int)
     duration_changed = Signal(int)
 
-    song_was_listened = Signal()
+    listening_time_signal = Signal(int, float) #id, tempo
 
     def __init__(self, app):
         super().__init__()
@@ -98,11 +105,11 @@ class MahouPlayer(QObject):
 
 
     def load_song(self, song: Song):
+
         self.stop_timer()
 
         # ! CONTINUAR AQUI, FUNÇÃO DE ANOTAR TEMPO DE MÚSICA OUVIDO
 
-        self.timer = None
         path = song.path.resolve()
         if not path.is_file():
             raise FileNotFoundError(f"Song path {path} does not exist or is not a valid song path")
@@ -128,15 +135,12 @@ class MahouPlayer(QObject):
             self.timer.pause()
 
     def stop_song(self):
-        if self.timer is not None:
-            total = self.timer.stop()
-            self.timer = None
+        self.stop_timer()
 
         self.media_player.stop()
         self.media_player.setSource(QUrl())
 
         
-
     def get_pos(self):
         """ Returns posision in milliseconds """
         return self.media_player.position()
@@ -146,11 +150,22 @@ class MahouPlayer(QObject):
 
 
     def stop_timer(self):
-        if self.timer is not None:
-            total_time = self.timer.stop()
+        if self.timer is None:
+            return 0
 
-        if total_time >= 30:
-            self.song_was_listened.emit()
+        total_time = self.timer.stop()
+
+        print(total_time)
+
+        self.timer = None
+
+        if self.loaded_song is None:
+            return
+        
+        self.listening_time_signal.emit(self.loaded_song.id, total_time)
+
+
+        return total_time
 
 
 

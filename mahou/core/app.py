@@ -20,13 +20,24 @@ class App:
         self.folder_scanner = FolderScanner(database = self.song_database)
 
         self.qt_app = QApplication(sys.argv) #qt app
+
         self.player = MahouPlayer(app = self) #player
+        self.player.listening_time_signal.connect(self.handle_listening_time)
+
         self.mahou_window = MahouInterface(app = self) #mainwindow
 
         self.mahou_window.show()
 
-      
+
+
+    def handle_listening_time(self, song_id: int, listening_time: float):
+        if listening_time >= 30:
+            self.song_database.increment_song_play_count(song_id)
+
+        self.song_database.update_song_listen_time(song_id, listening_time)
         
+
+
     def run(self):
         self.qt_app.exec()
         pass

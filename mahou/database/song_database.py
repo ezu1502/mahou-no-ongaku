@@ -49,13 +49,10 @@ class SongDatabase:
     def commit(self):
         self.connection.commit()
 
-    def load_command(self, command: GeneralCommands | SongCommands, subfolder = None) -> str:
+    def load_command(self, command: GeneralCommands | SongCommands) -> str:
         """ Lê o comando escrito num arquivo .sql, retorna uma string """
 
-        if subfolder is not None:
-            sql_path = Path(__file__).parent / "sql_commands" / subfolder / command
-        else:
-            sql_path = Path(__file__).parent / "sql_commands" / command
+        sql_path = Path(__file__).parent / "sql_commands" / command
 
         if not sql_path.exists():
             raise FileNotFoundError(f"Caminho de comando não encontrado! {sql_path}")
@@ -110,4 +107,20 @@ class SongDatabase:
 
     def reset_song_map(self):
         self._song_map = None
+
+
+    def increment_song_play_count(self, song_id):
+        """ Recebe um ID de uma música e incrementa o play_count dela"""
+
+        self.cursor.execute(self.load_command(SongCommands.INCREMENT_PLAY_COUNT), (song_id,))
+
+        self.commit()
+
+    def update_song_listen_time(self, song_id, listen_time):
+        """ Recebe um ID de uma música junto com o tempo da última sessão, depois atualiza no database
+        o listen_time dela com esse valor
+        """
+
+        self.cursor.execute(self.load_command(SongCommands.UPDATE_LISTEN_TIME), (listen_time, song_id))
+        self.commit()
 

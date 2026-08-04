@@ -2,12 +2,16 @@ from enum import Enum, StrEnum
 from pathlib import Path
 
 class GeneralCommands(StrEnum):
-    CREATE_TABLE = "create_table.sql"
+    CREATE_TABLE = "general/create_table.sql"
 
 class SongCommands(StrEnum):
-    SEARCH_ID = "search_song_id.sql"
-    SEARCH_PATH = "search_song_path.sql"
+    SEARCH_ID = "song/search_song_id.sql"
+    SEARCH_PATH = "song/search_song_path.sql"
 
-    CHECK_EXISTS = "check_song_exists.sql"
-    INSERT_SONG = "insert_song.sql"
-    SELECT_ALL = "select_all_songs.sql"
+    CHECK_EXISTS = "song/check_song_exists.sql"
+    INSERT_SONG = "song/insert_song.sql"
+    SELECT_ALL = "song/select_all_songs.sql"
+
+    INCREMENT_PLAY_COUNT = "song/increment_play_count.sql"
+    UPDATE_LISTEN_TIME = "song/update_listen_time.sql"
+

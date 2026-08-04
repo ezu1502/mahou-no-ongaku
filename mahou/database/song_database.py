@@ -70,13 +70,16 @@ class SongDatabase:
         if result is None:
             return None
 
-        return self._tuple_to_song(result)
-        
-    @staticmethod
-    def _tuple_to_song(song_tuple: tuple[int, str, str]) -> Song:
-        song_id, song_path, title = song_tuple
+        return self._row_to_song(result)
 
-        return Song(id = song_id, path = Path(song_path), title_ = title)
+    def from_database(self):
+        ...
+
+    @staticmethod
+    def _row_to_song(song_tuple: tuple[int, str, str, int, float]) -> Song:
+        song_id, song_path, title, play_count, listen_time = song_tuple
+
+        return Song(id = song_id, path = Path(song_path), title_ = title, play_count = play_count, listen_time = listen_time)
     
     @property
     def song_map(self) -> dict[int, Song]:
@@ -98,7 +101,7 @@ class SongDatabase:
         song_map: dict[int, Song] = {}
 
         for song_info in all_songs_list:
-            song = self._tuple_to_song(song_info)
+            song = self._row_to_song(song_info)
             song_map[song.id] = song
 
         self._song_map = song_map

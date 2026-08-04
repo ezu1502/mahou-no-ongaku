@@ -6,9 +6,16 @@ log = BoccaFiglia("Song_Class", "#00FF00")
 
 @dataclass
 class Song:
+
     id: int
     path: Path
     title_: str
+    play_count: int
+    listen_time: float
+
+    @classmethod
+    def from_database(cls):
+        ...
 
     @property
     def title(self):

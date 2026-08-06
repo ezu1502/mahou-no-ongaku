@@ -89,9 +89,9 @@ QPushButton:disabled {
     color: #353535;
 }
 
-/* QLISTWIDGET */
+/* QLISTVIEW */
 
-QListWidget {
+QListView{
     background-color: #141414;
     color: #EEEEEE;
     font-family: "Bahnschrift";
@@ -119,15 +119,15 @@ QListWidget {
     
 }
 
-QListWidget::item {
+QListView::item {
     padding: 12px;
     font-weight: bold;
 }   
-QListWidget::item:hover {
+QListView::item:hover {
     background: #2a2a2a;
     border: none
 }   
-QListWidget::item:selected {
+QListView::item:selected {
     background-color: qlineargradient(
         x1:0, y1:0,
         x2:0, y2:1,
@@ -137,10 +137,10 @@ QListWidget::item:selected {
     );
     border: none;
 }   
-QListWidget::item:selected:!active {
+QListView::item:selected:!active {
     color: #EEEEEE;
 }   
-QListWidget::item:selected:!active {
+QListView::item:selected:!active {
     
 }   
 

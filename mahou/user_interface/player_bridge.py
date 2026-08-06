@@ -29,34 +29,23 @@ class PlayerBridge:
             case PS.IN_MENU:
                 self.load_and_play()
 
-
-
     def load_and_play(self, specific_item = None, play = True):
         if specific_item is None:
-            item = self.master.get_listbox_selection()
-            if item is None:
+            song = self.master.selected_song
+            if song is None:
                 return
         else:
-            item = specific_item
+            song = specific_item
         
-        song_id = item.data(Qt.ItemDataRole.UserRole)
-  
-        if song_id is None:
-            return
-        
-        song = self.master.get_song_from_id(song_id)
-
         self.player.load_song(song)
+
         if play:
             self.player.play_song()
 
-
-        self.master.update_listbox_UI(new_item = item)
-        
-        self.master.playing_item = item
-
-
-        self.master.see_item(item)
+        self.master.update_listbox_UI() # ! corrigir
+    
+        self.master.set_playing_song(song)
+        self.master.see_item(song)
 
         song_title = song.title
         self.show_now_playing(song_title)
@@ -89,32 +78,34 @@ class PlayerBridge:
         
 
     def change_song(self, change):
-        if self.player.loaded_song is None or self.master.playing_item is None:
+        if self.player.loaded_song is None or self.master.playing_song is None:
             return
         if change == 0:
             return
         if change not in (-1, 1):
             raise ValueError(f"Unexpected change value: ({change}). \nChange in function change_song must be between (-1) and (1)")
         
-        item_count = self.master.listbox.count()
+        item_count = self.master.list_model.rowCount()
+
         if item_count == 0:
             return
-        
-        current_index = self.master.listbox.row(self.master.playing_item)
+
+        current_song = self.master.playing_song
+        current_index = self.master.list_model.int_index_from_song(current_song)
 
         print(current_index)
         new_index = (current_index + change) % item_count
 
-        new_item = self.master.listbox.item(new_index)
+        new_song = self.master.list_model.song_list[new_index]
 
-        if new_item is None:
+        if new_song is None:
             return
 
         match self.get_state():
             case PS.PLAYING | PS.IN_MENU:
-                self.load_and_play(new_item)
+                self.load_and_play(new_song)
             case PS.PAUSED:
-                self.load_and_play(new_item)
+                self.load_and_play(new_song)
                 self.player.pause_song()
             
 #endregion

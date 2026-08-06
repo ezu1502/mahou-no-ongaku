@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, Q
 QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox, QLineEdit, QListView)
 
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QModelIndex
 from mahou_libs.time_functions import TimeCounter
 from mahou_libs.mahou_math import conversions
 from mahou.user_interface.player_bridge import PlayerBridge
@@ -33,7 +33,7 @@ class MahouMainScreen(QWidget):
         self.player = app.player
         self.bridge = PlayerBridge(master = self)
 
-        self.playing_item = None
+        self.playing_song = None
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(align.AlignTop)
@@ -44,7 +44,9 @@ class MahouMainScreen(QWidget):
 
         self.current_song_title = None
 
-
+    def set_playing_song(self, song: Song):
+        self.playing_song = song
+        self.list_model.set_playing_song_id(song.id)
 # region SIGNAL HANDLERS
 
     def handle_duration_changed(self, duration):
@@ -84,11 +86,9 @@ class MahouMainScreen(QWidget):
         self.save_view_options()
 
     def manage_play_selected_button(self):
-        selected_items = self.listbox.selectedItems()
-        item = selected_items[0] if selected_items else None  
-        
-        
-        self.play_selected_button.setEnabled(item is not self.playing_item and item is not None)
+        must_show = self.selected_song == self.playing_song and self.playing_song is not None
+    
+        self.play_selected_button.setEnabled(must_show)
 
     def show_now_playing(self, text: str = "None", just_update_color = False) -> None:
         color = self.get_highlight_color()
@@ -169,7 +169,8 @@ class MahouMainScreen(QWidget):
         self.listbox.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.listbox.setAlternatingRowColors(True)
         self.listbox.setUniformItemSizes(True)
-        self.listbox.itemSelectionChanged.connect(self.manage_play_selected_button)
+
+        self.listbox.selectionModel().currentChanged.connect(self.on_selection_changed)
 
         self.search_and_listbox_layout.addWidget(self.listbox)
         self.middle_layout.addWidget(self.search_and_listbox_widget, 9)
@@ -332,28 +333,24 @@ class MahouMainScreen(QWidget):
 
         # * -------------
 
-        self.update_listbox_list(self.song_map)
 
         # * ------------------------------
 
 #endregion
     # @TimeCounter("Search Action")
+
+    def on_selection_changed(self, current: QModelIndex, previous: QModelIndex):
+        self.selected_song = self.list_model.get_song(current)
+
+        if self.selected_song is None:
+            return
+
+        self.manage_play_selected_button()
+
+        print(self.selected_song.title)
+
     def on_search(self, search):
-
-    # * CONTINUAR DAQUI! CRIAR UM MÉTODO QUE ORDENA O SONG MAP SOZINHO
-    
-        if not search:
-            self.update_listbox_list(self.song_map, set_mode = True)
-
-
-        filtered = {song_id : song for song_id, song in self.song_map.items()
-                         if search.lower() in song.title.lower()}
-
-        ordered = dict(sorted(filtered.items(), key = lambda item:(
-            item[1].title.lower().find(search.lower()),
-            item[1].title.lower()
-        )))
-        self.update_listbox_list(ordered, set_mode = True)
+        ...
 
         
 #region SAVE/LOAD options
@@ -388,23 +385,7 @@ class MahouMainScreen(QWidget):
     
 #endregion
 #region LIST REGION
-    @TimeCounter
-    def update_listbox_list(self, song_map: dict[int, Song], set_mode: bool = False):
-        """ Precisa de um dict id : Song """
-        if song_map is None:
-            return
-
-        if set_mode:
-            for i in range(self.listbox.count()):
-                # ! continuar daqui
-                self.listbox.clear()
-
-        for song_id, song in song_map.items():
-            song_item = QListWidgetItem(song.title)
-            song_item.setData(Qt.ItemDataRole.UserRole, song_id)
-            self.listbox.addItem(song_item)
-
-
+   
     def scan_folder(self):
         """ Folder_scanner -> App -> Main_screen """
         folder_string = QFileDialog.getExistingDirectory(self, "Choose a folder")
@@ -433,22 +414,16 @@ class MahouMainScreen(QWidget):
 
         clicked = msg.clickedButton()
 
-        if clicked == add:
-            self.update_listbox_list(scanned_songs, set_mode = False)
-        elif clicked == set_button:
-            self.update_listbox_list(scanned_songs, set_mode = True)
-        else:
-            return
+        # if clicked == add:
+        #     self.update_listbox_list(scanned_songs, set_mode = False)
+        # elif clicked == set_button:
+        #     self.update_listbox_list(scanned_songs, set_mode = True)
+        # else:
+        #     return
 
         self.bridge.stop_song()
  
 
-
-    
-    def get_listbox_selection(self):
-        selected_items = self.listbox.selectedItems()
-        item = selected_items[0] if selected_items else None  
-        return item
     
     
     @property
@@ -492,33 +467,38 @@ class MahouMainScreen(QWidget):
         theme = self.main_window.current_theme
         color = HIGHLIGHT_COLORS.get(theme, "#FF0000")
         return color
-    def update_listbox_UI(self, new_item):
-        if self.playing_item is not None:
-            self.playing_item.setForeground(QBrush())
-            
-        color = self.get_highlight_color()
-        new_item.setForeground(QColor(color))
-        new_item.setSelected(False)
+    
+    def update_listbox_UI(self):
+        selection_model = self.listbox.selectionModel()
+
+        selection_model.clearCurrentIndex()
+        selection_model.clearSelection()
+
+        
+
 
     def update_highlight_theme(self, theme):
-        if self.playing_item is None:
-            return
+        # if self.playing_item is None:
+        #     return
         
-        color = HIGHLIGHT_COLORS.get(theme, "#FF0000")
-        self.playing_item.setForeground(QColor(color))
-        self.playing_item.setSelected(False)
+        # color = HIGHLIGHT_COLORS.get(theme, "#FF0000")
+        # self.playing_item.setForeground(QColor(color))
+        # self.playing_item.setSelected(False)
+        pass
 
     def reset_listbox_UI(self):
-        if self.playing_item is None:
-            return
+        # if self.playing_item is None:
+        #     return
 
-        try:
-            self.playing_item.setForeground(QBrush())
-        except RuntimeError:
-            print("Já foi apagado, mas fica de boa")
+        # try:
+        #     self.playing_item.setForeground(QBrush())
+        # except RuntimeError:
+        #     print("Já foi apagado, mas fica de boa")
+        pass
 
-    def see_item(self, item) -> None:
-        self.listbox.scrollToItem(item)
+    def see_item(self, song) -> None:
+        index = self.list_model.model_index_from_song(song)
+        self.listbox.scrollTo(index)
 
 #region state
     def get_state(self) -> PS:

@@ -1,6 +1,7 @@
 #PYSIDE6 IMPORTS
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
-QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox, QLineEdit)
+QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox, QLineEdit, QListView)
+
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt
 from mahou_libs.time_functions import TimeCounter
@@ -160,7 +161,11 @@ class MahouMainScreen(QWidget):
 
         self.search_and_listbox_layout.addWidget(self.search_bar)
 
-        self.listbox = QListWidget()
+        self.list_model = self.app.get_list_model()
+
+        self.listbox = QListView()
+        self.listbox.setModel(self.list_model)
+
         self.listbox.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.listbox.setAlternatingRowColors(True)
         self.listbox.setUniformItemSizes(True)
@@ -390,12 +395,15 @@ class MahouMainScreen(QWidget):
             return
 
         if set_mode:
-            self.listbox.clear()
+            for i in range(self.listbox.count()):
+                # ! continuar daqui
+                self.listbox.clear()
 
         for song_id, song in song_map.items():
             song_item = QListWidgetItem(song.title)
             song_item.setData(Qt.ItemDataRole.UserRole, song_id)
             self.listbox.addItem(song_item)
+
 
     def scan_folder(self):
         """ Folder_scanner -> App -> Main_screen """
@@ -503,8 +511,11 @@ class MahouMainScreen(QWidget):
     def reset_listbox_UI(self):
         if self.playing_item is None:
             return
-        
-        self.playing_item.setForeground(QBrush())
+
+        try:
+            self.playing_item.setForeground(QBrush())
+        except RuntimeError:
+            print("Já foi apagado, mas fica de boa")
 
     def see_item(self, item) -> None:
         self.listbox.scrollToItem(item)

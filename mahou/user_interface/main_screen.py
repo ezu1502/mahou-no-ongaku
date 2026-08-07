@@ -34,6 +34,7 @@ class MahouMainScreen(QWidget):
         self.bridge = PlayerBridge(master = self)
 
         self.playing_song = None
+        self.selected_song = None
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(align.AlignTop)
@@ -85,10 +86,6 @@ class MahouMainScreen(QWidget):
 
         self.save_view_options()
 
-    def manage_play_selected_button(self):
-        must_show = self.selected_song == self.playing_song and self.playing_song is not None
-    
-        self.play_selected_button.setEnabled(must_show)
 
     def show_now_playing(self, text: str = "None", just_update_color = False) -> None:
         color = self.get_highlight_color()
@@ -110,8 +107,6 @@ class MahouMainScreen(QWidget):
 
  
 
-        
-        
     def hide_now_playing(self) -> None:
         if not self.now_playing.isVisible():
             return
@@ -162,9 +157,10 @@ class MahouMainScreen(QWidget):
         self.search_and_listbox_layout.addWidget(self.search_bar)
 
         self.list_model = self.app.get_list_model()
+        self.proxy = self.app.get_proxy_model()
 
         self.listbox = QListView()
-        self.listbox.setModel(self.list_model)
+        self.listbox.setModel(self.proxy)
 
         self.listbox.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.listbox.setAlternatingRowColors(True)
@@ -340,7 +336,8 @@ class MahouMainScreen(QWidget):
     # @TimeCounter("Search Action")
 
     def on_selection_changed(self, current: QModelIndex, previous: QModelIndex):
-        self.selected_song = self.list_model.get_song(current)
+        source_index = self.proxy.mapToSource(current)
+        self.selected_song = self.list_model.get_song_from_model_index(source_index)
 
         if self.selected_song is None:
             return
@@ -349,8 +346,21 @@ class MahouMainScreen(QWidget):
 
         print(self.selected_song.title)
 
+    
+    def manage_play_selected_button(self):
+        must_show_button = (
+            self.selected_song is not None
+            and self.playing_song is not None
+            and (self.selected_song != self.playing_song)
+        )
+
+        print(must_show_button)
+
+        self.play_selected_button.setEnabled(must_show_button)
+
+
     def on_search(self, search):
-        ...
+        self.proxy.set_search_text(search)
 
         
 #region SAVE/LOAD options
@@ -471,8 +481,12 @@ class MahouMainScreen(QWidget):
     def update_listbox_UI(self):
         selection_model = self.listbox.selectionModel()
 
+        self.selected_song = None
+
         selection_model.clearCurrentIndex()
         selection_model.clearSelection()
+
+        self.manage_play_selected_button()
 
         
 
@@ -497,8 +511,17 @@ class MahouMainScreen(QWidget):
         pass
 
     def see_item(self, song) -> None:
-        index = self.list_model.model_index_from_song(song)
-        self.listbox.scrollTo(index)
+        source_index = self.list_model.model_index_from_song(song)
+
+        if source_index is None:
+            return
+        
+        proxy_index = self.proxy.mapFromSource(source_index)
+
+        if not proxy_index.isValid():
+            return
+        
+        self.listbox.scrollTo(proxy_index)
 
 #region state
     def get_state(self) -> PS:

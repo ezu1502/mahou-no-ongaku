@@ -1,7 +1,7 @@
-from PySide6.QtCore import QAbstractListModel, Qt, QModelIndex
+from PySide6.QtCore import QAbstractListModel, QPersistentModelIndex, Qt, QModelIndex, QSortFilterProxyModel
 from PySide6.QtGui import QColor, QBrush
 from mahou.core.song import Song
-from typing import Literal
+from typing import Literal, cast
 from contextlib import contextmanager
 
 from mahou_libs.time_functions import TimeCounter
@@ -39,15 +39,6 @@ class SongListModel(QAbstractListModel):
             self.dataChanged.emit(new_model_index, new_model_index, [Roles.ForegroundRole])
  
             
-        
-        
-
-
-        
-
-
-
-
     def model_index_from_song(self, song: Song) -> QModelIndex | None:
         try:
             row = self.song_list.index(song)
@@ -59,16 +50,11 @@ class SongListModel(QAbstractListModel):
     def model_index_from_row(self, row: int) -> QModelIndex:
         return self.createIndex(row, 0)
         
-            
-
-            
-
-
-
+        
     def rowCount(self, parent = QModelIndex()) -> int:
         return len(self.song_list)
 
-    def get_song(self, index: QModelIndex) -> Song | None:
+    def get_song_from_model_index(self, index: QModelIndex) -> Song | None:
         if not index.isValid():
             return None
 
@@ -130,3 +116,111 @@ class SongListModel(QAbstractListModel):
     def _reload_song_list(self):
         with self.reset_model():
             self.song_list = list(self.song_map.values())
+
+
+
+class SongProxyModel(QSortFilterProxyModel):
+    def __init__(self, model: SongListModel):
+        super().__init__() 
+
+        self.setSourceModel(model)
+        self.search_text = ""
+        self.sort_mode: Literal["title", "artist", "play_count"] = "title"
+
+    @property
+    def source_model(self):
+        if self.sourceModel() is None:
+            raise RuntimeError("Proxy's source model is None!")
+        return cast(SongListModel, self.sourceModel())
+
+    
+    def set_search_text(self, text: str):
+
+        if text.lower() == self.search_text:
+            return
+
+        self.search_text = text.lower()
+
+        self.invalidate()
+        self.sort_by("title", reverse = False)
+
+    def sort_by(self, key: Literal["title", "artist", "play_count"], reverse = True):
+            self.sort_mode = key
+            self.invalidate()
+    
+    
+            Sorting = Qt.SortOrder
+    
+            order = (
+                Sorting.DescendingOrder if reverse else Sorting.AscendingOrder
+            )
+    
+            self.sort(0, order)
+
+
+
+
+    def basic_search(self, search: str, title: str):
+        return search.lower() in title.lower()
+
+    def filterAcceptsRow(self, row, parent):
+        if not self.search_text:
+            return True
+
+        index = self.source_model.index(row, 0, parent)
+
+        title = self.sourceModel().data(index, Roles.DisplayRole)
+
+        if title is None:
+            return False
+
+        return self.basic_search(search = self.search_text, title = title)
+
+
+    def lessThan(self, left, right):
+        left_song = self.source_model.get_song_from_model_index(left)
+        right_song = self.source_model.get_song_from_model_index(right)
+
+        if left_song is None or right_song is None:
+            return False
+
+
+        if self.search_text:
+            score_left = self.get_search_score(left_song)
+            score_right = self.get_search_score(right_song)
+
+            if score_left == score_right:
+                return left_song.title.lower() < right_song.title.lower()
+
+            return score_left > score_right
+
+
+        
+        match self.sort_mode:
+            case "title":
+                return left_song.title.lower() < right_song.title.lower()
+
+
+        return False
+                
+
+    def get_search_score(self, song) -> int:
+        title: str = song.title.lower()
+        search = self.search_text
+
+        if title.startswith(search):
+            return 100
+
+   
+        term_distance = title.find(search)
+        if term_distance != -1: # é que o find retorna -1 se n achar o termo
+            term_distance = min(9, term_distance)
+            return 100 - (term_distance*10)
+        return 0
+
+
+
+
+    
+
+        

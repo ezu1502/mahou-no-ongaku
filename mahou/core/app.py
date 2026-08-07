@@ -8,6 +8,7 @@ from mahou import file_manager as FM
 from mahou.database.song_database import SongDatabase
 from mahou.database.folder_scanner import FolderScanner
 from pathlib import Path
+from mahou.user_interface.components.song_list_model import SongListModel, SongProxyModel
 
 class App:
     @TimeCounter
@@ -16,6 +17,9 @@ class App:
         
         self.song_database = SongDatabase()
         self.song_database.initialize()
+
+        self.list_model = SongListModel(self.song_database)
+        self.proxy_model = SongProxyModel(self.list_model)
 
         self.folder_scanner = FolderScanner(database = self.song_database)
 
@@ -59,4 +63,9 @@ class App:
     def set_stylesheet(self, stylesheet_string):
         self.qt_app.setStyleSheet(stylesheet_string)
 
-    
+
+    def get_list_model(self) -> SongListModel:
+        return self.list_model
+
+    def get_proxy_model(self) -> SongProxyModel:
+        return self.proxy_model

@@ -122,12 +122,13 @@ class MahouInterface(QMainWindow):
 
 
     def save_configs(self):
-        current_item = self.main_screen.playing_item
-        if current_item is None:
+        current_song = self.main_screen.playing_song
+        if current_song is None:
             return
         
         position = self.player.get_pos()
-        song_id = current_item.data(Qt.ItemDataRole.UserRole)
+        song_id = current_song.id
+        
         configs_dict = {
             Settings.CURRENT_SONG_ID : song_id,
             Settings.SONG_POS : position,

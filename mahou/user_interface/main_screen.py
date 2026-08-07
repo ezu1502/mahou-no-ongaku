@@ -1,6 +1,7 @@
 #PYSIDE6 IMPORTS
 from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QListWidget,
 QListWidgetItem, QGridLayout, QFileDialog, QSizePolicy, QSlider, QMessageBox, QLineEdit, QListView)
+from PySide6.QtWidgets import QAbstractItemView
 
 from PySide6.QtGui import QBrush, QColor, QShortcut, QKeySequence, QAction
 from PySide6.QtCore import Qt, QModelIndex
@@ -45,7 +46,7 @@ class MahouMainScreen(QWidget):
 
         self.current_song_title = None
 
-    def set_playing_song(self, song: Song):
+    def set_playing_song(self, song: Song | None):
         self.playing_song = song
         self.list_model.set_playing_song(song)
 # region SIGNAL HANDLERS
@@ -153,6 +154,7 @@ class MahouMainScreen(QWidget):
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("Search song...")
         self.search_bar.textChanged.connect(self.on_search)
+        self.search_bar.setClearButtonEnabled(True)
 
         self.search_and_listbox_layout.addWidget(self.search_bar)
 
@@ -165,6 +167,12 @@ class MahouMainScreen(QWidget):
         self.listbox.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.listbox.setAlternatingRowColors(True)
         self.listbox.setUniformItemSizes(True)
+        # self.listbox.setBatchSize(30)
+        self.listbox.setViewMode(QListView.ViewMode.ListMode)
+
+        self.listbox.setVerticalScrollMode(
+            QAbstractItemView.ScrollMode.ScrollPerPixel
+        )
 
         self.listbox.selectionModel().currentChanged.connect(self.on_selection_changed)
 
@@ -344,7 +352,7 @@ class MahouMainScreen(QWidget):
 
         self.manage_play_selected_button()
 
-        print(self.selected_song.title)
+        # print(self.selected_song.title)
 
     
     def manage_play_selected_button(self):
@@ -354,7 +362,7 @@ class MahouMainScreen(QWidget):
             and (self.selected_song != self.playing_song)
         )
 
-        print(must_show_button)
+        # print(must_show_button)
 
         self.play_selected_button.setEnabled(must_show_button)
 

@@ -23,16 +23,18 @@ class SongListModel(QAbstractListModel):
     def set_playing_song(self, song: Song | None):
         """ Troca a variável self.playing_song para um valor novo, e avisa que os valores mudaram para que a UI seja atualizada
         """
-        if song is None:
-            return
-
+        
         old_song = self.playing_song
         self.playing_song = song
 
+    
         if old_song is not None:
             old_model_index = self.model_index_from_song(old_song)
             if old_model_index is not None:
                 self.dataChanged.emit(old_model_index, old_model_index, [Roles.ForegroundRole])
+
+        if self.playing_song is None:
+            return
 
         new_model_index = self.model_index_from_song(self.playing_song)
         if new_model_index is not None:
@@ -68,7 +70,6 @@ class SongListModel(QAbstractListModel):
 
     
 
-
     def data(self, index, role = Roles.DisplayRole):
         if not index.isValid():
             return None
@@ -85,7 +86,7 @@ class SongListModel(QAbstractListModel):
                 return QBrush(QColor("#FFC400"))
             
             return None
-       
+    
         return None
 
     def update_list_order(self, key: Literal["title", "id", "play_count"]):

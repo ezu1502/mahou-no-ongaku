@@ -67,7 +67,7 @@ class PlayerBridge:
         self.player.play_song()
 
     def stop_song(self):
-        self.master.playing_song = None
+        self.master.set_playing_song(None)
 
         self.player.stop_song()
     

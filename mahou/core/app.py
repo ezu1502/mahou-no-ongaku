@@ -13,24 +13,29 @@ from mahou.user_interface.components.song_list_model import SongListModel, SongP
 class App:
     @TimeCounter
     def __init__(self) -> None:
-        self.state = PS.IN_MENU #DEFAULT STATE SET
-        
-        self.song_database = SongDatabase()
-        self.song_database.initialize()
 
-        self.list_model = SongListModel(self.song_database)
-        self.proxy_model = SongProxyModel(self.list_model)
+        with TimeCounter("Basic variables created"):
+            self.state = PS.IN_MENU #DEFAULT STATE SET
+            
+            self.song_database = SongDatabase()
+            self.song_database.initialize()
 
-        self.folder_scanner = FolderScanner(database = self.song_database)
+            self.list_model = SongListModel(self.song_database)
+            self.proxy_model = SongProxyModel(self.list_model)
 
-        self.qt_app = QApplication(sys.argv) #qt app
+            self.folder_scanner = FolderScanner(database = self.song_database)
 
-        self.player = MahouPlayer(app = self) #player
-        self.player.listening_time_signal.connect(self.handle_listening_time)
 
-        self.mahou_window = MahouInterface(app = self) #mainwindow
+        with TimeCounter("Qt_app + Player + Window"):
+            self.qt_app = QApplication(sys.argv) #qt app
 
-        self.mahou_window.show()
+            self.player = MahouPlayer(app = self) #player
+            self.player.listening_time_signal.connect(self.handle_listening_time)
+
+            self.mahou_window = MahouInterface(app = self) #mainwindow
+            with TimeCounter("window_show"):
+                self.mahou_window.show()
+                
 
 
 

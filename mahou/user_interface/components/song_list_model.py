@@ -4,6 +4,8 @@ from mahou.core.song import Song
 from typing import Literal
 from contextlib import contextmanager
 
+from mahou_libs.time_functions import TimeCounter
+
 Roles = Qt.ItemDataRole
 
 class SongListModel(QAbstractListModel):
@@ -15,10 +17,53 @@ class SongListModel(QAbstractListModel):
         self.song_map: dict[int, Song] = self.database.song_map
         self.song_list: list[Song] = list(self.song_map.values())
 
-        self.playing_song_id = None
+        self.playing_song: Song | None = None
 
-    def set_playing_song_id(self, song_id):
-        self.playing_song_id = song_id
+    @TimeCounter
+    def set_playing_song(self, song: Song | None):
+        """ Troca a variável self.playing_song para um valor novo, e avisa que os valores mudaram para que a UI seja atualizada
+        """
+        if song is None:
+            return
+
+        old_song = self.playing_song
+        self.playing_song = song
+
+        if old_song is not None:
+            old_model_index = self.model_index_from_song(old_song)
+            if old_model_index is not None:
+                self.dataChanged.emit(old_model_index, old_model_index, [Roles.ForegroundRole])
+
+        new_model_index = self.model_index_from_song(self.playing_song)
+        if new_model_index is not None:
+            self.dataChanged.emit(new_model_index, new_model_index, [Roles.ForegroundRole])
+ 
+            
+        
+        
+
+
+        
+
+
+
+
+    def model_index_from_song(self, song: Song) -> QModelIndex | None:
+        try:
+            row = self.song_list.index(song)
+            return self.createIndex(row, 0)
+        except ValueError:
+            return None
+
+
+    def model_index_from_row(self, row: int) -> QModelIndex:
+        return self.createIndex(row, 0)
+        
+            
+
+            
+
+
 
     def rowCount(self, parent = QModelIndex()) -> int:
         return len(self.song_list)
@@ -33,9 +78,10 @@ class SongListModel(QAbstractListModel):
         return self.song_list.index(song)
             
     
-    def model_index_from_song(self, song: Song) -> QModelIndex:
-        row = self.song_list.index(song)
-        return self.createIndex(row, 0)
+    
+
+    
+
 
     def data(self, index, role = Roles.DisplayRole):
         if not index.isValid():
@@ -48,10 +94,9 @@ class SongListModel(QAbstractListModel):
             return song.title
         if role == Roles.UserRole:
             return song.id
-
         if role == Roles.ForegroundRole:
-            if song.id == self.playing_song_id:
-                return QColor("#FFC400")
+            if song == self.playing_song:
+                return QBrush(QColor("#FFC400"))
             
             return None
        

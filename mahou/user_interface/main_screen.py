@@ -46,7 +46,7 @@ class MahouMainScreen(QWidget):
 
     def set_playing_song(self, song: Song):
         self.playing_song = song
-        self.list_model.set_playing_song_id(song.id)
+        self.list_model.set_playing_song(song)
 # region SIGNAL HANDLERS
 
     def handle_duration_changed(self, duration):

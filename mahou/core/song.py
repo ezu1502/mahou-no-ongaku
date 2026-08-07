@@ -23,6 +23,15 @@ class Song:
         name = name.replace("\ufeff", "")
         return name
 
+    def __eq__(self, compared: object) -> bool:
+        if isinstance(compared, Song):
+            return compared.id == self.id
+        elif isinstance(compared, int):
+            return compared == self.id
+
+        return NotImplemented
+
+
 
         
 

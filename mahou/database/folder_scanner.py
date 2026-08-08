@@ -1,6 +1,8 @@
 from pathlib import Path
 from mahou.database.song_database import SongDatabase
-
+from mutagen import File, MutagenError
+from mutagen.id3 import ID3
+from enum import Enum
 AUDIO_EXTENSIONS = {
     ".mp3",
     ".flac",
@@ -9,6 +11,20 @@ AUDIO_EXTENSIONS = {
     ".m4a",
     ".aac",
 }
+
+class Tags:
+    class MP3(Enum):
+        TITLE = "TIT2"
+        ARTIST = "TPE1"
+        ALBUM = "TALB"
+        DATE = "TDRC"
+        GENRE = "TCON"
+        TRACK_NUMBER = "TRCK"   
+
+
+
+
+
 
 class FolderScanner:
     def __init__(self, database:SongDatabase):
@@ -34,4 +50,23 @@ class FolderScanner:
         self.database.reset_song_map()
 
         return songs
+
+    def scan_metadata(self, song_path: Path):
+        try:
+            id3_tags = ID3(song_path)
+        except MutagenError:
+            return {}
+
+
+        loaded_tags = {}
+        
+        for tag_type in Tags.MP3:
+            tag = id3_tags.get(tag_type.value)
+
+            if tag is None:
+                loaded_tags[tag_type.name] = "None"
+                continue
+
+            loaded_tags[tag_type.name] = tag.text[0]
+    
         

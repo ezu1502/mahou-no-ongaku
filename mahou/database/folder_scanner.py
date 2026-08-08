@@ -22,10 +22,6 @@ class Tags:
         TRACK_NUMBER = "TRCK"   
 
 
-
-
-
-
 class FolderScanner:
     def __init__(self, database:SongDatabase):
         self.database = database
@@ -41,7 +37,16 @@ class FolderScanner:
         songs = []
         for path in folder.iterdir():
             if path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS:
-                song = self.database.get_or_create_song(song_path = path, commit = False) #esse método retorna songs
+
+                song_metadata = self.scan_metadata(path)
+
+                song = self.database.get_or_create_song(
+                    song_path = path,
+                    song_metadata = song_metadata,
+                    commit = False
+                    )
+                #esse método retorna songs
+
                 if song is not None:
                     songs.append(song)
             
@@ -62,11 +67,25 @@ class FolderScanner:
         
         for tag_type in Tags.MP3:
             tag = id3_tags.get(tag_type.value)
+            tag_name = tag_type.name.lower()
 
             if tag is None:
-                loaded_tags[tag_type.name] = "None"
+                loaded_tags[tag_name] = None
                 continue
 
-            loaded_tags[tag_type.name] = tag.text[0]
-    
+            if tag_type == Tags.MP3.TRACK_NUMBER:
+                try:
+                    value = int(tag.text[0].split("/")[0])
+                except (ValueError, IndexError):
+                    print("Track number conversion went wrong")
+                    value = None
+
+
+                loaded_tags[tag_name] = value
+            else:
+                loaded_tags[tag_name] = str(tag.text[0])
+
+
+        return loaded_tags
+
         

@@ -10,6 +10,7 @@ class SongCommands(StrEnum):
 
     CHECK_EXISTS = "song/check_song_exists.sql"
     INSERT_SONG = "song/insert_song.sql"
+    INSERT_METADATA = "song/insert_metadata.sql"
     SELECT_ALL = "song/select_all_songs.sql"
 
     INCREMENT_PLAY_COUNT = "song/increment_play_count.sql"

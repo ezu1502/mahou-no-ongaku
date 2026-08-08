@@ -4,6 +4,17 @@ from mahou_libs.bocca import BoccaFiglia
 
 log = BoccaFiglia("Song_Class", "#00FF00")
 
+
+
+@dataclass
+class SongMetadata:
+    artist: str | None = None
+    album: str | None = None
+    track_number: int | None = None
+    genre: str | None = None
+    date: str | None = None
+
+
 @dataclass
 class Song:
 
@@ -12,10 +23,8 @@ class Song:
     title_: str
     play_count: int
     listen_time: float
+    metadata: SongMetadata | None = None
 
-    @classmethod
-    def from_database(cls):
-        ...
 
     @property
     def title(self):
@@ -31,7 +40,14 @@ class Song:
 
         return NotImplemented
 
+    
 
+
+
+
+
+    
+    
 
         
 

@@ -3,7 +3,7 @@ from pathlib import Path
 from enum import Enum
 from mahou_libs.bocca import BoccaFiglia
 from mahou_libs.time_functions import TimeCounter
-from mahou.core.song import Song
+from mahou.core.song import Song, SongMetadata
 from mahou.database.command_enums import SongCommands, GeneralCommands
 import sqlite3
 log = BoccaFiglia("song_database", "#9191FF")
@@ -26,17 +26,22 @@ class SongDatabase:
         self.connection.commit()
 
     def check_song_exists(self, song_path) -> bool:
-        
-        self.cursor.execute(self.load_command(SongCommands.CHECK_EXISTS), (str(song_path),))
+        self.execute(SongCommands.CHECK_EXISTS, (str(song_path),))
         return self.cursor.fetchone() is not None
 
-    def get_or_create_song(self, song_path: Path, custom_title: str | None = None, commit: bool = True) -> Song | None:
+    def get_or_create_song(self, song_path: Path, song_metadata: dict | None = None, custom_title: str | None = None, commit: bool = True) -> Song | None:
         """ Adiciona uma música ao database se ela não estiver lá. Retorna essa música também no formato Song """
         if custom_title is None:
             custom_title = song_path.stem
 
         if not self.check_song_exists(song_path):
             self.insert_song(song_path, custom_title)
+            song_id = self.cursor.lastrowid
+
+            if song_metadata:
+                self.insert_metadata(song_id, song_metadata)
+
+
             self.reset_song_map()
             if commit:
                 self.commit()
@@ -44,7 +49,22 @@ class SongDatabase:
         return self.search_song_by_path(song_path)
 
     def insert_song(self, song_path, song_title):
-        self.cursor.execute(self.load_command(SongCommands.INSERT_SONG), (str(song_path), song_title))
+        self.execute(SongCommands.INSERT_SONG, (str(song_path), song_title))
+
+    def insert_metadata(self, song_id, metadata: dict) -> None:
+        self.execute(SongCommands.INSERT_METADATA, (
+            song_id,
+            metadata.get("artist"),
+            metadata.get("album"),
+            metadata.get("track_number"),
+            metadata.get("genre"),
+            metadata.get("date")
+        ))
+
+
+    def execute(self, command, args: tuple):
+        self.cursor.execute(self.load_command(command), args)
+
     
     def commit(self):
         self.connection.commit()
@@ -77,12 +97,24 @@ class SongDatabase:
 
     @staticmethod
     def _row_to_song(row: sqlite3.Row) -> Song:
+        song_metadata = None
+
+        if row["song_id"] is not None:
+            song_metadata = SongMetadata(
+                artist = row["artist"],
+                album = row["album"],
+                track_number = row["track_number"],
+                genre = row["genre"],
+                date = row["date"],
+            )
+
         return Song(
             id = row["id"],
             path = Path(row["path"]),
             title_ = row["title"],
             play_count = row["play_count"],
             listen_time = row["listen_time"],
+            metadata = song_metadata
         )
     
     @property
@@ -118,7 +150,7 @@ class SongDatabase:
     def increment_song_play_count(self, song_id):
         """ Recebe um ID de uma música e incrementa o play_count dela"""
 
-        self.cursor.execute(self.load_command(SongCommands.INCREMENT_PLAY_COUNT), (song_id,))
+        self.execute(SongCommands.INCREMENT_PLAY_COUNT, (song_id,))
 
         self.commit()
 
@@ -127,6 +159,7 @@ class SongDatabase:
         o listen_time dela com esse valor
         """
 
-        self.cursor.execute(self.load_command(SongCommands.UPDATE_LISTEN_TIME), (listen_time, song_id))
+        self.execute(SongCommands.UPDATE_LISTEN_TIME, (listen_time, song_id))
         self.commit()
+
 

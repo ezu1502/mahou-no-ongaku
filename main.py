@@ -29,4 +29,3 @@ try:
         mahou_app.run()
 finally:
     log.info(end_message)
-

@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from mahou_libs.time_functions import TimeCounter
 
 Roles = Qt.ItemDataRole
+ARTIST_ROLE = Roles.UserRole + 1
 
 class SongListModel(QAbstractListModel):
     def __init__(self, database) -> None:
@@ -86,6 +87,8 @@ class SongListModel(QAbstractListModel):
                 return QBrush(QColor("#FFC400"))
             
             return None
+        if role == ARTIST_ROLE:
+                return song.metadata.artist if song.metadata is not None else None
     
         return None
 

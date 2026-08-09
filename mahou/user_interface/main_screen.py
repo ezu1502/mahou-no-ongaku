@@ -14,7 +14,6 @@ from pathlib import Path
 import json
 from mahou import file_manager
 
-
 align = Qt.AlignmentFlag
 size_policy = QSizePolicy.Policy
 
@@ -160,7 +159,7 @@ class MahouMainScreen(QWidget):
 
         self.list_model = self.app.get_list_model()
         self.proxy = self.app.get_proxy_model()
-
+        
         self.listbox = QListView()
         self.listbox.setModel(self.proxy)
 
@@ -345,14 +344,15 @@ class MahouMainScreen(QWidget):
 
     def on_selection_changed(self, current: QModelIndex, previous: QModelIndex):
         source_index = self.proxy.mapToSource(current)
-        self.selected_song = self.list_model.get_song_from_model_index(source_index)
+        self.selected_song: Song | None = self.list_model.get_song_from_model_index(source_index)
 
         if self.selected_song is None:
             return
-
+        
         self.manage_play_selected_button()
 
-        # print(self.selected_song.title)
+        if self.selected_song.metadata:
+            print(self.selected_song.metadata.artist)
 
     
     def manage_play_selected_button(self):

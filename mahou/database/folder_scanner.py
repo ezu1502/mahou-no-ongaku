@@ -89,3 +89,5 @@ class FolderScanner:
         return loaded_tags
 
         
+
+        # ! CONTINUAR DAQUI!!!!

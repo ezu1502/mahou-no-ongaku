@@ -1,0 +1,6 @@
+
+CREATE TABLE IF NOT EXISTS songs (
+    id INTEGER PRIMARY KEY,
+    path TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL
+);

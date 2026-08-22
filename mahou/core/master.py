@@ -5,4 +5,4 @@ class Master:
         self.launcher = UILauncher()
 
     def run(self):
-        ...
+        self.launcher.launch()

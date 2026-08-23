@@ -2,8 +2,9 @@ import QtQuick
 import QtQuick.Controls.Basic
 
 Label {
-    font.family: "Bahnschrift"
-    font.pixelSize: 18
+    id: root
 
     color: "#EEEEEE"
+
+    font.family: 
 }

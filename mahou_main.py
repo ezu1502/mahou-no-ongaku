@@ -1,6 +1,7 @@
 from mahou.app import App
 import sys
 
+
 def execute():
     print("Running!")
     try:

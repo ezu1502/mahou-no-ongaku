@@ -1,9 +1,8 @@
-
 from __future__ import annotations
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtCore import QObject, Property, Slot
+from PySide6.QtCore import QObject, Property, Slot, QUrl
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -16,7 +15,19 @@ class BackEnd(QObject):
         super().__init__()
 
         self.window = window
+        self.app = self.window.app
 
+    @Slot(QUrl)
+    def receive_folder(self, folder: QUrl):
+        """ Manda o app chamar o folder_scanner na pasta recebida pelo FolderDialog """
+        folder_path = folder.toLocalFile()
+
+        if not folder_path:
+            return
+
+        folder_path = Path(folder_path)
+
+        self.app.call_folder_scanner(folder_path = folder_path)
 
 
 class MahouWindow:

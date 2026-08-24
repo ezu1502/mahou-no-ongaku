@@ -4,13 +4,13 @@ import QtQuick.Controls.Basic
 Button {
     id: root
 
-    property int defaultWidth: 180
-    property int defaultHeight: 55
+    property int defaultWidth: 220
+    property int defaultHeight: 60
 
     width: defaultWidth
     height: defaultHeight
 
-    font.family: "Bahnschrift"
+    font.family: "M PLUS 1p"
     font.pixelSize: 18
 
     property color baseColor: "#222222"
@@ -31,7 +31,7 @@ Button {
 
     background: Rectangle {
         color: "#222222"
-        radius: 12
+        radius: 7
 
         border.width: 1
         border.color: "#4c4c4c"

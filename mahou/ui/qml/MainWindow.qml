@@ -41,15 +41,19 @@ ApplicationWindow {
 
         MahouButton {
             text: "Scan Folder"
+
+            onClicked: {
+                folderChooser.open()
+            }
         }
 
         Row {
-            spacing: 4
+            spacing: 8
             MahouButton {
                 id: previousButton
                 text: "Previous"
 
-                width: previousButton.defaultWidth / 2 - 2
+                width: previousButton.defaultWidth / 2 - 4
 
             }
             MahouButton{
@@ -57,11 +61,14 @@ ApplicationWindow {
                 text: "Next"
 
                 
-                width: nextButton.defaultWidth / 2 - 2
+                width: nextButton.defaultWidth / 2 - 4
 
             }
         }
         
     }
     
+    FolderChooser {
+        id: folderChooser
+    }
 }

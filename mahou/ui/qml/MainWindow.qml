@@ -18,6 +18,7 @@ ApplicationWindow {
     visible: true
 
     MahouLabel {
+        id: mahouTitle
         text: "Mahou no Ongaku"
 
         font.family: "Zen Kaku Gothic New"
@@ -29,44 +30,69 @@ ApplicationWindow {
         anchors.top: parent.top
 
     }
-    Column {
+
+    Item {
+        anchors.top: mahouTitle.bottom
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+
+        anchors.margins: 25
+        anchors.topMargin: 20
+
+    Row {
         anchors.centerIn: parent
+
         spacing: 15
-
         
-
-        MahouButton {
-            text: "PLAY"
+        MahouListbox {
+            id: mahouListbox
         }
 
-        MahouButton {
-            text: "Scan Folder"
+        Column {
+            spacing: 15
 
-            onClicked: {
-                folderChooser.open()
-            }
-        }
-
-        Row {
-            spacing: 8
             MahouButton {
-                id: previousButton
-                text: "Previous"
-
-                width: previousButton.defaultWidth / 2 - 4
-
+                text: "PLAY"
             }
-            MahouButton{
-                id: nextButton
-                text: "Next"
 
-                
-                width: nextButton.defaultWidth / 2 - 4
+            MahouButton {
+                text: "Scan Folder"
 
+                onClicked: {
+                    folderChooser.open()
+                }
             }
+
+            Row {
+                spacing: 8
+                MahouButton {
+                    id: previousButton
+                    text: "Previous"
+
+                    width: previousButton.defaultWidth / 2 - 4
+
+                }
+                MahouButton{
+                    id: nextButton
+                    text: "Next"
+
+                    
+                    width: nextButton.defaultWidth / 2 - 4
+
+                }
+            }
+            
         }
+
         
     }
+    }
+
+/*
+   
+
+*/
     
     FolderChooser {
         id: folderChooser

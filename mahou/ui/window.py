@@ -42,6 +42,8 @@ class MahouWindow:
 
     def launch(self):
         self.engine.rootContext().setContextProperty("backend", self.backend)
+        self.engine.rootContext().setContextProperty("song_proxy", self.app.song_proxy)
+
         self.engine.load(self.qml_file)
 
         if not self.engine.rootObjects():

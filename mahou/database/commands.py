@@ -9,4 +9,6 @@ class Commands(Enum):
     INSERT_SONG = cmd_path / "insert_song.sql"
     CHECK_PATH_EXISTS = cmd_path / "check_path_exists.sql"
 
+    GET_ALL_SONGS = cmd_path / "get_all_songs.sql"
+
     

@@ -4,6 +4,7 @@ from mahou.database.connection import get_connection
 from pathlib import Path
 import sqlite3
 from typing_extensions import TYPE_CHECKING
+from mahou.song import Song
 
 if TYPE_CHECKING:
     from mahou.app import App
@@ -51,6 +52,25 @@ class SongDatabase:
         else:
             if commit:
                 self.commit()
+
+    def get_song_list(self) -> list[Song]:
+        """ Puxa todas as musicas do database, cria objetos Song na memória e retorna uma lista com eles
+        """
+
+        self.cursor.execute(self.read_command(Commands.GET_ALL_SONGS))
+
+        songs = self.cursor.fetchall()
+
+        song_list: list[Song] = []
+
+        for song_id, path, title in songs:
+            song = Song(id = song_id, path = Path(path), custom_title = title)
+            song_list.append(song)
+
+        return song_list
+        
+
+
 
         
 

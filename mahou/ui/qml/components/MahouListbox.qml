@@ -24,7 +24,14 @@ Rectangle {
 
         clip: true
 
+        onCurrentIndexChanged: {
+            if (currentIndex >= 0){
+                const index = song_proxy.index(currentIndex, 0)
+                const song = song_proxy.data(index, Qt.UserRole + 2)
 
+                backend.select_song(song)
+            }
+        }
         
         ScrollBar.vertical: ScrollBar {
             id: scroll

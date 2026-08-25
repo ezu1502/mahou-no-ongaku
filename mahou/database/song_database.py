@@ -5,10 +5,10 @@ import json
 from pathlib import Path
 import sqlite3
 from typing_extensions import TYPE_CHECKING
-from mahou.song import Song, SongMetadata
+from mahou.core.song import Song, SongMetadata
 
 if TYPE_CHECKING:
-    from mahou.app import App
+    from mahou.core.app import App
 
 class SongDatabase:
     def __init__(self, app: App):

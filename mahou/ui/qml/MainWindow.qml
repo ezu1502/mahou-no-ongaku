@@ -68,8 +68,16 @@ ApplicationWindow {
                 
                 
                 MahouButton {
-                    text: "PLAY"
+                    text: (playerState === "playing") ? "PAUSE" : "PLAY"
+                    
+                    property string playerState: backend.state
+
+                    onClicked: {
+                        backend.play_button()
+                    }
                 }
+                // TODO TERMINAR DE LINKAR O STATE DO PLAYER COM O DA WINDOW
+                
 
                 MahouButton {
                     text: "Scan Folder"

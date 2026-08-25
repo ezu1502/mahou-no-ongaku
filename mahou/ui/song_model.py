@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
 from PySide6.QtCore import QAbstractListModel, QByteArray, Qt, QSortFilterProxyModel, QModelIndex
-from mahou.song import Song
+from mahou.core.song import Song
 from typing_extensions import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -17,6 +17,7 @@ class Filters(Enum):
 
 
 class SongModel(QAbstractListModel):
+    SONG_ROLE = Roles.UserRole
     ARTIST_ROLE = Roles.UserRole + 1
     PATH_ROLE = Roles.UserRole + 2
 
@@ -25,7 +26,12 @@ class SongModel(QAbstractListModel):
 
         self.database = database
 
+        self.song_list: list[Song] = self.database.get_song_list()
+
+    def refresh_song_list(self) -> None:
+        self.beginResetModel()
         self.song_list = self.database.get_song_list()
+        self.endResetModel()
 
     def initialize(self):
         ...
@@ -35,6 +41,7 @@ class SongModel(QAbstractListModel):
             Roles.DisplayRole: b"title",
             self.ARTIST_ROLE: b"artist",
             self.PATH_ROLE: b"path",
+            self.SONG_ROLE: b"song_obj",
         }
         
     def rowCount(self, parent = None) -> int:
@@ -55,10 +62,12 @@ class SongModel(QAbstractListModel):
                 return song.metadata.artist
 
             return "Unknown"
-            
-
+        
         if role == self.PATH_ROLE:
             return str(song.path)
+
+        if role == self.SONG_ROLE:
+            return song
 
         return None
 

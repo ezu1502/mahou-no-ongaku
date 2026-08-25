@@ -1,4 +1,4 @@
-from mahou.app import App
+from mahou.core.app import App
 import sys
 
 

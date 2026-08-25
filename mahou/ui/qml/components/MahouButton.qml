@@ -4,7 +4,7 @@ import QtQuick.Controls.Basic
 Button {
     id: root
 
-    property int defaultWidth: 220
+    property int defaultWidth: 290
     property int defaultHeight: 60
 
     width: defaultWidth

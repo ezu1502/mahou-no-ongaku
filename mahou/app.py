@@ -8,13 +8,16 @@ class App:
     def __init__(self) -> None:
         self.database = SongDatabase(app = self)
         self.window = MahouWindow(app = self)
-
         self.song_model = SongModel(database = self.database)
         self.song_proxy = SongProxy(model = self.song_model)
         
+        
     def run(self):
         self.database.initialize()
+        self.song_model.initialize()
         self.window.launch()
+
+       
 
     
     def call_folder_scanner(self, folder_path: Path):

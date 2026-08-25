@@ -1,10 +1,11 @@
 from __future__ import annotations
 from mahou.database.commands import Commands
 from mahou.database.connection import get_connection
+import json
 from pathlib import Path
 import sqlite3
 from typing_extensions import TYPE_CHECKING
-from mahou.song import Song
+from mahou.song import Song, SongMetadata
 
 if TYPE_CHECKING:
     from mahou.app import App
@@ -41,12 +42,22 @@ class SongDatabase:
 
         return cmd_text
 
-    def insert_song_path(self, song_path: Path, commit: bool = True) -> None:
+    def insert_song_path(self, song_path: Path, metadata: str | None = None, commit: bool = True) -> None:
         """ Insere uma música no database. Se ela já estiver lá, ótimo
         """
 
         try:
-            self.cursor.execute(self.read_command(Commands.INSERT_SONG), (str(song_path), song_path.stem))
+            
+            self.cursor.execute(
+                self.read_command(Commands.INSERT_SONG),
+                (
+                    str(song_path),
+                    song_path.stem,
+                    metadata
+                )
+            )
+        
+
         except sqlite3.IntegrityError as error:
             print(f"\n{error} while inserting song path: {song_path}")
         else:
@@ -63,8 +74,18 @@ class SongDatabase:
 
         song_list: list[Song] = []
 
-        for song_id, path, title in songs:
-            song = Song(id = song_id, path = Path(path), custom_title = title)
+        for song_id, path, title, metadata in songs:
+
+            song_metadata = None
+
+            if metadata is not None:
+                metadata_dict = json.loads(metadata)
+                song_metadata = SongMetadata(artist = metadata_dict.get("artist", None)) if metadata_dict else None
+
+
+            song = Song(id = song_id, path = Path(path), custom_title = title, metadata = song_metadata)
+
+                
             song_list.append(song)
 
         return song_list

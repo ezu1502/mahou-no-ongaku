@@ -1,4 +1,5 @@
 from __future__ import annotations
+from enum import Enum, auto
 from PySide6.QtCore import QAbstractListModel, QByteArray, Qt, QSortFilterProxyModel, QModelIndex
 from mahou.song import Song
 from typing_extensions import TYPE_CHECKING
@@ -7,6 +8,13 @@ if TYPE_CHECKING:
     from mahou.database.song_database import SongDatabase
 
 Roles = Qt.ItemDataRole
+
+class Filters(Enum):
+    ALL = auto()
+    PLAYLISTS = auto()
+    ALBUMS = auto()
+    ARTISTS = auto()
+
 
 class SongModel(QAbstractListModel):
     ARTIST_ROLE = Roles.UserRole + 1
@@ -17,8 +25,10 @@ class SongModel(QAbstractListModel):
 
         self.database = database
 
-        self.song_list: list[Song] = self.database.get_song_list()
+        self.song_list = self.database.get_song_list()
 
+    def initialize(self):
+        ...
 
     def roleNames(self):
         return {
@@ -41,9 +51,11 @@ class SongModel(QAbstractListModel):
             return song.title
 
         if role == self.ARTIST_ROLE:
-            # return song.metadata.artist if song.has_metadata() else "Unknown"
-            #TODO implementar
+            if song.metadata is not None and song.metadata.artist is not None:
+                return song.metadata.artist
+
             return "Unknown"
+            
 
         if role == self.PATH_ROLE:
             return str(song.path)
@@ -56,6 +68,38 @@ class SongProxy(QSortFilterProxyModel):
         super().__init__()
 
         self.setSourceModel(model)
+
+        self.current_filter = Filters.ALL
+
+        self.sort(0)
+
+    def set_filter(self, filter: Filters):
+        self.current_filter = filter
+        self.invalidateFilter()
+
+    def set_sorting_method(self, method):
+        #TODO fazer essa implementação
+        self.sort(0)
+
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
+        match self.current_filter:
+            case Filters.ALL:
+                return True
+            case Filters.PLAYLISTS:
+                return False
+            case Filters.ALBUMS:
+                return False
+            case Filters.ARTISTS:
+                return False
+
+        return False
+
+    def lessThan(self, source_left: QModelIndex, source_right: QModelIndex) -> bool:
+        left = source_left.data(Roles.DisplayRole)
+        right = source_right.data(Roles.DisplayRole)
+
+        return left.lower() < right.lower()
 
 
 

@@ -22,6 +22,9 @@ Rectangle {
 
         currentIndex: -1
 
+        clip: true
+
+
         
         ScrollBar.vertical: ScrollBar {
             id: scroll
@@ -36,6 +39,11 @@ Rectangle {
 
             contentItem: Rectangle {
                 implicitWidth: 6
+
+                implicitHeight: 50
+
+
+
                 radius: width / 2
                 
 

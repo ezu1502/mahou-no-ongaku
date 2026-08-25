@@ -1,2 +1,2 @@
-SELECT id, path, title
-FROM SONGS;
+SELECT id, path, title, metadata
+FROM songs;

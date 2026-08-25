@@ -62,21 +62,32 @@ Rectangle {
         }
     }
     
-    Text {
-        text: model.title
-
-        color: "#EEEEEE"
-
-        font.family: "M PLUS 1p"
-        font.pixelSize: 16
-
-        font.weight: 500
-
+    Column {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
 
         anchors.leftMargin: 10
 
+        Text {
+            text: model.title
+
+            color: "#EEEEEE"
+
+            font.family: "M PLUS 1p"
+            font.pixelSize: 16
+
+            font.weight: 500
+        }
+        Text {
+            text: model.artist
+
+            color: '#868585'
+
+            font.family: "M PLUS 1p"
+            font.pixelSize: 12
+
+            font.weight: 500
+        }
 
     }
 

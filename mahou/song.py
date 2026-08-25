@@ -25,6 +25,7 @@ class Song:
 class SongMetadata:
 
     artist: str | None
-    genre: str | None
+    genre: str | None = None
+    album: str | None = None #não implementado ainda
 
     #TODO adicionar mais info

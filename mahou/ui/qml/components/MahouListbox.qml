@@ -12,6 +12,10 @@ Rectangle {
     border.width: 3
     border.color: "#202020"
 
+    function clearSelection() {
+        root.currentIndex = -1
+    }
+
     ListView {
         id: root
 

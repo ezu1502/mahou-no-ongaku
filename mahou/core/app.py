@@ -2,7 +2,7 @@ from mahou.core.player import MahouPlayer
 from mahou.ui.window import MahouWindow
 from mahou.database.song_database import SongDatabase
 from mahou.ui.song_model import SongModel, SongProxy
-from mahou.folder_scanner import scan_folder
+from mahou.services.folder_scanner import scan_folder
 from pathlib import Path
 
 class App:

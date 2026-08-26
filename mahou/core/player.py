@@ -4,6 +4,7 @@ from PySide6.QtCore import QUrl, QObject, Signal
 from mahou.core.enums import PlayerState as PS
 from pathlib import Path
 
+
 from typing_extensions import TYPE_CHECKING
 
 if TYPE_CHECKING:

@@ -1,3 +1,5 @@
+import os; os.environ["QT_LOGGING_RULES"] = "qt.multimedia.ffmpeg*=false"
+
 from mahou.core.app import App
 import sys
 

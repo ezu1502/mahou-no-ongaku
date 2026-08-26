@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 
 Rectangle {
     id: itemDelegate
-    height: 45
+    height: 55
 
     property ListView listView
     property int itemIndex

@@ -49,6 +49,12 @@ class BackEnd(QObject):
     def toggle(self):
         self.window.toggle()
 
+    @Slot()
+    def stop_song(self):
+        self.window.stop_song()
+
+
+
     @Property(str, notify = stateChanged)
     def state(self):
         return self.window.state.value
@@ -105,6 +111,11 @@ class MahouWindow:
                 self.selected_path = None
             case _:
                 raise RuntimeError("Invalid state at toggle function")
+
+    def stop_song(self):
+        self.app.player.stop_song()
+
+        self.playing_path = None
 
     def set_state(self, state: PS) -> None:
         self.state = state

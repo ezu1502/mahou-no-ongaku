@@ -17,6 +17,9 @@ class App:
     def run(self):
         self.database.initialize()
         self.song_model.initialize()
+
+        self.player.playerStateChanged.connect(self.window.set_state)
+
         self.window.launch()
     
     def call_folder_scanner(self, folder_path: Path):

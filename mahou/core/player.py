@@ -59,6 +59,12 @@ class MahouPlayer(QObject):
 
         self.playerStateChanged.emit(PS.PAUSED)
 
+    def unpause_song(self):
+        self.media.play()
+
+        self.playerStateChanged.emit(PS.PLAYING)
+        
+
     def stop_song(self) -> None:
         self.media.stop()
 

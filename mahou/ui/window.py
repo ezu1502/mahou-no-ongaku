@@ -11,8 +11,6 @@ from mahou.core.enums import PlayerState as PS
 if TYPE_CHECKING:
     from mahou.core.app import App
 
-
-
 class BackEnd(QObject):
 
     stateChanged = Signal()
@@ -48,14 +46,12 @@ class BackEnd(QObject):
         print(true_path)
 
     @Slot()
-    def play_button(self):
-        self.window.play_button()
+    def toggle(self):
+        self.window.toggle()
 
     @Property(str, notify = stateChanged)
     def state(self):
-        return self.window.state
-
-
+        return self.window.state.value
 
 
 class MahouWindow:
@@ -73,8 +69,13 @@ class MahouWindow:
         self.playing_path: None | Path = None
 
     def launch(self):
+        """ Carrega o arquivo QML, manda o backend pro QML
+        """
         self.engine.rootContext().setContextProperty("backend", self.backend)
         self.engine.rootContext().setContextProperty("song_proxy", self.app.song_proxy)
+
+        # print("BACKEND:", self.backend)
+        # print("CONTEXT:", self.engine.rootContext())
 
         self.engine.load(self.qml_file)
 
@@ -83,26 +84,29 @@ class MahouWindow:
 
         self.qml_app.exec()
 
-    def play_button(self):
-        if self.selected_path is None:
-            return
-        
-        self.app.player.load_and_play(self.selected_path)
-        self.playing_path = self.selected_path
-        self.selected_path = None
+    def toggle(self):
+        """ Chamada pelo backend, essa função é chamada quando o usuário aperta o botão PLAY/PAUSE.
+        carrega o caminho atualmente selecionado, atualiza o estado e toca a música.
+        """
+
+        match self.state:
+            case PS.PLAYING:
+                self.app.player.pause_song()
+
+            case PS.PAUSED:
+                self.app.player.unpause_song()
+
+            case PS.MENU:
+                if self.selected_path is None:
+                    return
+                
+                self.app.player.load_and_play(self.selected_path)
+                self.playing_path = self.selected_path
+                self.selected_path = None
+            case _:
+                raise RuntimeError("Invalid state at toggle function")
 
     def set_state(self, state: PS) -> None:
         self.state = state
 
-
-
-
-        
-
-
-
-
-
-
-
-
+        self.backend.stateChanged.emit()

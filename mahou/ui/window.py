@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class BackEnd(QObject):
 
-    stateChanged = Signal()
+    stateChanged = Signal(str)
 
     def __init__(self, window: MahouWindow):
         super().__init__()
@@ -43,7 +43,7 @@ class BackEnd(QObject):
 
         self.window.selected_path = true_path
 
-        print(true_path)
+        # print(true_path)
 
     @Slot()
     def toggle(self):
@@ -53,6 +53,8 @@ class BackEnd(QObject):
     def stop_song(self):
         self.window.stop_song()
 
+    def state_changed(self, state: PS):
+        self.stateChanged.emit(state.value)
 
 
     @Property(str, notify = stateChanged)
@@ -61,8 +63,8 @@ class BackEnd(QObject):
 
     @Property(str, notify = stateChanged)
     def now_playing(self):
-        if self.window.state == PS.PLAYING and self.window.playing_path is not None:
-            print(self.window.playing_path.stem)
+        if self.window.state in [PS.PLAYING, PS.PAUSED] and self.window.playing_path is not None:
+            # print(self.window.playing_path.stem)
             return self.window.playing_path.stem
         else:
             return "None"
@@ -72,6 +74,7 @@ class BackEnd(QObject):
 
 
 class MahouWindow:
+    stateChanged = Signal(str)
     def __init__(self, app: App):
         self.app = app
         
@@ -81,9 +84,11 @@ class MahouWindow:
 
         self.qml_file = Path(__file__).parent / "qml" / "MainWindow.qml"
 
-        self.state: PS = PS.MENU
         self.selected_path: None | Path = None
-        self.playing_path: None | Path = None
+
+    @property
+    def state(self):
+        return self.app.player.state
 
     def launch(self):
         """ Carrega o arquivo QML, manda o backend pro QML
@@ -116,21 +121,18 @@ class MahouWindow:
             case PS.MENU:
                 if self.selected_path is None:
                     return
-                
-                
-                self.playing_path = self.selected_path
+            
+                self.app.player.load_and_play(self.selected_path)
                 self.selected_path = None
-
-                self.app.player.load_and_play(self.playing_path)
             case _:
                 raise RuntimeError("Invalid state at toggle function")
 
     def stop_song(self):
         self.app.player.stop_song()
 
-        self.playing_path = None
+    
+    @property
+    def playing_path(self):
+        return self.app.player.playing_path
 
-    def set_state(self, state: PS) -> None:
-        self.state = state
 
-        self.backend.stateChanged.emit()

@@ -33,9 +33,6 @@ ApplicationWindow {
         }
     }
 
-
-
-
     MahouLabel {
         id: mahouTitle
         text: "Mahou no Ongaku"

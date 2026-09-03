@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     
 class MahouPlayer(QObject):
 
-    playerStateChanged = Signal(PS)
+    stateChanged = Signal(PS)
+    #TODO fazer progress bar
 
     def __init__(self, app: App):
         super().__init__()
@@ -27,6 +28,7 @@ class MahouPlayer(QObject):
         self.loaded_path: None | Path = None
         self.playing_path: None | Path = None
 
+        self.state: PS = PS.MENU
 
     def load_song(self, song_path: Path) -> None:
         """ recebe o caminho, carrega no Qmediaplayer, checa se o Qurl for válido e atualiza o estado do player
@@ -50,7 +52,7 @@ class MahouPlayer(QObject):
 
         self.playing_path = self.loaded_path
 
-        self.playerStateChanged.emit(PS.PLAYING)
+        self.set_state(PS.PLAYING)
 
         # TODO Implementar play_count += 1 no database!
         # TODO depois também testar erros de load e play para não enviar estado enganoso para a UI
@@ -58,12 +60,12 @@ class MahouPlayer(QObject):
     def pause_song(self) -> None:
         self.media.pause()
 
-        self.playerStateChanged.emit(PS.PAUSED)
+        self.set_state(PS.PAUSED)
 
     def unpause_song(self):
         self.media.play()
 
-        self.playerStateChanged.emit(PS.PLAYING)
+        self.set_state(PS.PLAYING)
         
 
     def stop_song(self) -> None:
@@ -71,12 +73,15 @@ class MahouPlayer(QObject):
 
         self.playing_path = None
 
-        self.playerStateChanged.emit(PS.MENU)
+        self.set_state(PS.MENU)
         
     def load_and_play(self, song_path: Path) -> None:
         self.load_song(song_path)
         self.play_song()
 
+    def set_state(self, state: PS):
+        self.state = state
+        self.stateChanged.emit(state)
 
 
 

@@ -59,6 +59,17 @@ class BackEnd(QObject):
     def state(self):
         return self.window.state.value
 
+    @Property(str, notify = stateChanged)
+    def now_playing(self):
+        if self.window.state == PS.PLAYING and self.window.playing_path is not None:
+            print(self.window.playing_path.stem)
+            return self.window.playing_path.stem
+        else:
+            return "None"
+
+    # TODO TERMINAR ISSO, CORRIGIR O SINAL DO NOW PLAYING
+
+
 
 class MahouWindow:
     def __init__(self, app: App):
@@ -106,9 +117,11 @@ class MahouWindow:
                 if self.selected_path is None:
                     return
                 
-                self.app.player.load_and_play(self.selected_path)
+                
                 self.playing_path = self.selected_path
                 self.selected_path = None
+
+                self.app.player.load_and_play(self.playing_path)
             case _:
                 raise RuntimeError("Invalid state at toggle function")
 

@@ -34,6 +34,7 @@ Item {
         onRequestFolderChooser: folderChooser.open()
     }
 
+    
     FolderChooser {
         id: folderChooser
     }

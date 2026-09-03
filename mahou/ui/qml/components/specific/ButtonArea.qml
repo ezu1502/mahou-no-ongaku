@@ -55,6 +55,20 @@ Item {
 
             }
         }
+
+        MahouLabel {
+            id: nowPlayingLabel
+
+            visible: backend.now_playing != "None"
+            text: "Now Playing: " + backend.now_playing
+            font.pixelSize: 20
+            font.weight: 500
+
+            anchors.topMargin: 10
+            anchors.horizontalCenter: parent.horizontalCenter
+
+        }
+
     
     }
 }

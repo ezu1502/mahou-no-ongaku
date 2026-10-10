@@ -1,0 +1,11 @@
+
+
+CREATE TABLE IF NOT EXISTS songs (
+    id INTEGER PRIMARY KEY,
+    path TEXT UNIQUE NOT NULL,
+
+    play_count INTEGER NOT NULL DEFAULT 0,
+    listen_time REAL NOT NULL DEFAULT 0,
+
+    title TEXT
+);

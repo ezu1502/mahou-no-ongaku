@@ -11,7 +11,7 @@ class SQLCommands(Enum):
     SCHEMA = auto()
     INSERT_SONG = auto()
 
-    
+    SELECT_ALL_SONGS = auto()
 
     @property
     def path(self) -> Path:

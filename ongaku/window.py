@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ongaku.app import App
+    from ongaku.list_model import ListProxy
 
 from PySide6.QtCore import QUrl, QObject, Slot
 from PySide6.QtQml import QQmlApplicationEngine
@@ -37,6 +38,8 @@ class Window:
 
         self.qml_path = Path(__file__).parent / "qml" / "main.qml"
 
+        self.proxy: ListProxy = self.app.list_proxy
+
     def load_fonts(self) -> None:
         fonts_dir: Path = Path(__file__).parent / "fonts"
 
@@ -56,6 +59,8 @@ class Window:
         self.load_fonts()
 
         self.engine.rootContext().setContextProperty("backend", self.backend)
+        self.engine.rootContext().setContextProperty("proxy", self.proxy)
+
         self.engine.load(QUrl.fromLocalFile(str(self.qml_path)))
 
         if not self.engine.rootObjects():
@@ -70,6 +75,14 @@ class Window:
         """
         result = self.app.call_folder_scanner(folder)
 
+        if result is not None:
+            self.app.reload_list_model()
+
 
         print(result)
         # TODO Devo fazer alguma coisa com esse resultado depois. Por enquanto fica só assim
+
+
+
+
+# TODO CONTINUAR DAQUI! ListModel e ListProxy criados, falta usar eles na ListView do QML!

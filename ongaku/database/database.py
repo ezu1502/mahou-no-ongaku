@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 from ongaku.database.commands import SQLCommands as Commands
+from ongaku.song import Song
 
 class Database:
     def __init__(self, app):
@@ -55,3 +56,25 @@ class Database:
                 return True
         except sqlite3.IntegrityError:
             return False
+
+    def get_all_songs(self) -> list[Song]:
+        """
+            Returns a list containing Song objects, representing database's full song library
+        """
+        songs: list[Song] = []
+
+        with self.connection(commit = False) as con:
+            result = con.execute(
+                self.read_command(Commands.SELECT_ALL_SONGS)
+            ).fetchall()
+
+            for path, title, play_count, listen_time in result:
+                songs.append(Song(
+                    path = Path(path),
+                    custom_title = title,
+                    play_count = play_count,
+                    listen_time = listen_time
+                ))
+
+            return songs
+

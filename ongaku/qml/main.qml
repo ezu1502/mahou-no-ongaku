@@ -62,84 +62,26 @@ ApplicationWindow {
 
         anchors.margins: 20
 
-        Button {
-            id: backButton
-            text: "◂"
+        PlaybackButton {
+            transparent_bg: true
+            text: "◁"
+            font.pixelSize: 20
 
-            width: 40
-            height: 40
-            
-            background: Rectangle {
-                color: "transparent"
-            }
-            contentItem: Text {
-
-                color: "#EEEEEE"
-
-                anchors.fill: parent
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text: backButton.text
-
-                font.pixelSize: 25
-            }
         }
 
-        
 
-
-        Button {
-            id: playButton
-
+        PlaybackButton {
             text: "▶"
 
-            width: 40
-            height: 40
-
-            background: Rectangle {
-                anchors.fill: parent
-                radius: parent.width / 2
-
-                color: '#6f33df'
-            }
-
-            contentItem: Text {
-                anchors.fill: parent
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text: playButton.text
-
-                font.pixelSize: 25
-            }
+            font.pixelSize: 25
+            font_color: "#111111"
         }
 
-        Button {
-            id: forwardButton
+        PlaybackButton {
+            transparent_bg: true
+            text: "▷"
+            font.pixelSize: 20
 
-            text: "▸"
-
-            width: 40
-            height: 40
-
-            background: Rectangle {
-                color: "transparent"
-            }
-            
-            contentItem: Text {
-                color: "#EEEEEE"
-                anchors.fill: parent
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text: forwardButton.text
-
-                font.pixelSize: 25
-            }
         }
     }
 

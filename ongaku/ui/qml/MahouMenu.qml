@@ -13,7 +13,6 @@ Menu {
         border.color: "#666666"
         border.width: 1
     }
-    clip: true
 
     delegate: MenuItem {
         id: menuItem

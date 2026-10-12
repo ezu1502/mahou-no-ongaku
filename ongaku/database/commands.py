@@ -13,6 +13,10 @@ class SQLCommands(Enum):
 
     SELECT_ALL_SONGS = auto()
 
+    GET_SONG_ID = auto()
+    INSERT_SONG_ARTIST = auto()
+    CHECK_ARTIST_EXISTS = auto()
+
     @property
     def path(self) -> Path:
         return COMMAND_FOLDER / self.value

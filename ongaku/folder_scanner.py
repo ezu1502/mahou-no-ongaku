@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from pathlib import Path
+import mutagen
 
 if TYPE_CHECKING:
     from ongaku.database.database import Database
@@ -16,6 +17,27 @@ EXTENSIONS: set[str] = {
     ".aiff",
     ".aif"
 }
+
+def get_song_metadata(song_path: Path) -> dict[str, str | None]:
+    try:
+        audio = mutagen.File(song_path, easy = True)
+
+    except (mutagen.MutagenError, OSError):
+        return {}
+
+    if audio is None or audio.tags is None:
+        return {}
+
+    def find(tag: str):
+        return audio.tags.get(tag, [None])[0]
+
+    return {
+        "artist": find("artist"),
+        "album": find("album"),
+        "date": find("date"),
+        "tracknumber": find("tracknumber")
+    }
+
 
 def scan_folder(folder: Path, database: Database) -> dict[str, list[Path]] | None:
     """
@@ -42,8 +64,9 @@ def scan_folder(folder: Path, database: Database) -> dict[str, list[Path]] | Non
             failed_files.append(file_path)
             continue
 
+        metadata: dict = get_song_metadata(file_path)
 
-        result = database.insert_song(file_path)
+        result = database.insert_song(file_path, metadata)
 
         if result:
             successful_files.append(file_path)

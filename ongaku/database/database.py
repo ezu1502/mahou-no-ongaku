@@ -11,16 +11,20 @@ class Database:
         self.db_path: Path = Path(__file__).parent.parent.parent / "mahou.db"
 
     def initialize(self) -> None:
+        schema = self.read_command(Commands.SCHEMA)
+
         with self.connection() as con:
-            con.execute(
-                self.read_command(Commands.SCHEMA)
+            con.executescript(
+                "BEGIN;\n"
+                + schema
+                + "\nCOMMIT;"
             )
 
     @contextmanager
     def connection(self, commit: bool = True) -> Generator[sqlite3.Connection, None, None]:
         connection = sqlite3.connect(str(self.db_path))
         try:
-            
+            connection.execute("PRAGMA foreign_keys = ON")
             yield connection
 
             if commit:
@@ -41,17 +45,49 @@ class Database:
 
         return command_text
 
+    def get_song_id(self, song_path:Path):
+        """
+            Receives a song path and returns the matching song's id
+        """
 
-    def insert_song(self, song_path: Path) -> bool:
+        ...
+
+
+    def insert_song(self, song_path: Path, metadata: dict) -> bool:
         """
             Tries to insert a song into the database. Returns True if succesful, False if sqlite3 fails.
         """
+        artist, album = metadata.get("artist"), metadata.get("album")
+        
+        allowed_keys = {"title", "date", "track_number"}
+        values = {
+            "path": str(song_path),
+
+            **{key: value for key, value in metadata.items() if value and key in allowed_keys}
+        }
+
+        """
+            This creates a dynamic SQL query, only inserting not NULL values without having to create multiple
+            .sql files
+        """
+
+        columns = ", ".join(values)
+        placeholders = ", ".join("?" for _ in values)
+
+        query = (
+            f"INSERT INTO songs ({columns})\n"
+            f"VALUES ({placeholders})"
+        )
+
         try:
             with self.connection() as con:
-                con.execute(
-                    self.read_command(Commands.INSERT_SONG),
-                    (str(song_path),)
-                )
+                con.execute(query, tuple(values.values()))
+
+
+                # TODO CONTINUAR AQUI!
+                # TODO IMPLEMENTAR LÓGICA DE INSERIR ARTISTA E ÁLBUM PARA CADA MÚSICA
+
+
 
                 return True
         except sqlite3.IntegrityError:

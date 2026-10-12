@@ -7,15 +7,24 @@ if TYPE_CHECKING:
     from ongaku.app import App
     from ongaku.list_model import ListProxy
 
-from PySide6.QtCore import QUrl, QObject, Slot
+from PySide6.QtCore import QUrl, QObject, Slot, Property, Signal
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtGui import QGuiApplication, QFontDatabase
 
 class BackEnd(QObject):
+    app_state_changed = Signal()
+
     def __init__(self, window: Window):
         super().__init__()
 
         self.window = window
+        self.app = self.window.app
+
+        self.selected_path: Path | None = None
+
+    @Property(str, notify = app_state_changed)
+    def app_state(self):
+        return self.app.state.name.lower()
 
     @Slot(QUrl)
     def receive_folder(self, folder_qurl: QUrl) -> None:
@@ -27,6 +36,17 @@ class BackEnd(QObject):
 
         if folder_path.is_dir():
             self.window.call_folder_scanner(folder_path)
+
+    @Slot(str)
+    def on_song_selected(self, path: str) -> None:
+        song_path = Path(path)
+        if song_path.is_file():
+            self.selected_path = song_path
+            print(song_path)
+
+    @Slot()
+    def toggle(self) -> None:
+        self.app.toggle(self.selected_path)
 
 class Window:
     def __init__(self, app: App) -> None:

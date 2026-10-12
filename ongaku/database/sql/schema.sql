@@ -9,3 +9,4 @@ CREATE TABLE IF NOT EXISTS songs (
 
     title TEXT
 );
+

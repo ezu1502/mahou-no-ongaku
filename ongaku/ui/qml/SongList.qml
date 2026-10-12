@@ -21,23 +21,44 @@ ListView {
         required property string title
         required property int index
         required property string path
+        required property string artists
 
         id: delegateRect
 
         width: root.width
-        height: 40
+        height: 50
 
         color: index === root.currentIndex ? "#333333" : "#222222"
 
-        MahouLabel {
-            text: parent.title
-            font.pixelSize: 18
-
-            anchors.fill: parent
-            
-            anchors.leftMargin: 20
-            verticalAlignment: Text.AlignVCenter
+        Behavior on color {
+            ColorAnimation {
+                duration: 80
+            }
         }
+
+        Column {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+
+
+            MahouLabel {    
+                text: delegateRect.title
+                font.pixelSize: 18    
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            MahouLabel {    
+                text: delegateRect.artists
+                font.pixelSize: 15
+                color: "#AAAAAA"    
+                verticalAlignment: Text.AlignVCenter
+
+            }
+
+            
+        }
+        
 
         MouseArea {
             anchors.fill: parent

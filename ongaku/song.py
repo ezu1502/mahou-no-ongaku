@@ -8,7 +8,10 @@ class Song:
     play_count: float
     listen_time: float
 
+    artists: list[str]
+
     custom_title: str | None = None
+
 
 
 

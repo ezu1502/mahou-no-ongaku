@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS song_artists (
         REFERENCES songs(id) ON DELETE CASCADE,
 
     artist_id INTEGER NOT NULL
-        REFERENCES artists(id) ON DELETE CASCADE
+        REFERENCES artists(id) ON DELETE CASCADE,
 
-    PRIMARY KEY (song_id, playlist_id)
+    PRIMARY KEY (song_id, artist_id)
 
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS song_albums (
         REFERENCES songs(id) ON DELETE CASCADE,
 
     album_id INTEGER NOT NULL
-        REFERENCES albums(id) ON DELETE CASCADE
+        REFERENCES albums(id) ON DELETE CASCADE,
 
     PRIMARY KEY (song_id, album_id)
 
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS song_playlists (
         REFERENCES songs(id) ON DELETE CASCADE,
 
     playlist_id INTEGER NOT NULL
-        REFERENCES playlists(id) ON DELETE CASCADE
+        REFERENCES playlists(id) ON DELETE CASCADE,
 
     position INTEGER,
 

@@ -9,13 +9,17 @@ class SQLCommands(Enum):
         return name.lower() + ".sql"
 
     SCHEMA = auto()
+
     INSERT_SONG = auto()
-
     SELECT_ALL_SONGS = auto()
-
     GET_SONG_ID = auto()
+
     INSERT_SONG_ARTIST = auto()
+    GET_SONG_ARTISTS = auto()
+    
     CHECK_ARTIST_EXISTS = auto()
+    GET_ARTIST_ID = auto()
+    CREATE_ARTIST = auto()
 
     @property
     def path(self) -> Path:

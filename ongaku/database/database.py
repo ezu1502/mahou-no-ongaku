@@ -14,6 +14,7 @@ class Database:
         schema = self.read_command(Commands.SCHEMA)
 
         with self.connection() as con:
+            print(schema)
             con.executescript(
                 "BEGIN;\n"
                 + schema
@@ -45,12 +46,54 @@ class Database:
 
         return command_text
 
-    def get_song_id(self, song_path:Path):
+    def get_song_id(self, song_path:Path, connection: sqlite3.Connection | None = None) -> int | None:
         """
             Receives a song path and returns the matching song's id
         """
 
-        ...
+        if connection is None:
+            with self.connection(commit = False) as con:
+                return self.get_song_id(song_path, connection = con)
+        else:
+            result = connection.execute(
+                self.read_command(Commands.GET_SONG_ID),
+                (str(song_path),)
+            ).fetchone()
+
+            return result[0] if result is not None else None
+
+
+    def insert_song_artist(self, artist_name: str, song_path: Path, connection: sqlite3.Connection) -> bool:
+        artist_id = connection.execute(
+            self.read_command(Commands.GET_ARTIST_ID),
+            (artist_name,)
+        ).fetchone()
+
+        if artist_id is None:
+            artist_id = connection.execute(
+                self.read_command(Commands.CREATE_ARTIST),
+                (artist_name,)
+            ).fetchone()
+
+        song_id = connection.execute(
+            self.read_command(Commands.GET_SONG_ID),
+            (str(song_path),)
+        ).fetchone()
+
+        if song_id is None or artist_id is None:
+            return False
+
+        song_id, artist_id = song_id[0], artist_id[0]
+
+        try:
+            connection.execute(
+                self.read_command(Commands.INSERT_SONG_ARTIST),
+                (song_id, artist_id)
+            )
+        except sqlite3.IntegrityError:
+            return False
+
+        return True
 
 
     def insert_song(self, song_path: Path, metadata: dict) -> bool:
@@ -63,7 +106,7 @@ class Database:
         values = {
             "path": str(song_path),
 
-            **{key: value for key, value in metadata.items() if value and key in allowed_keys}
+            **{key: value for key, value in metadata.items() if value is not None and key in allowed_keys}
         }
 
         """
@@ -83,15 +126,30 @@ class Database:
             with self.connection() as con:
                 con.execute(query, tuple(values.values()))
 
-
-                # TODO CONTINUAR AQUI!
-                # TODO IMPLEMENTAR LÓGICA DE INSERIR ARTISTA E ÁLBUM PARA CADA MÚSICA
-
-
+                if artist is not None:
+                    result = self.insert_song_artist(artist, song_path, con)
+                    if not result:
+                        raise RuntimeError("Couldn't link artist to song")
 
                 return True
         except sqlite3.IntegrityError:
             return False
+
+    def get_song_artists(self, song_path: Path, *, connection: sqlite3.Connection | None = None) -> list[str]:
+        """
+            Receives a song path and returns a list of its artists
+        """
+
+        if connection is None:
+            with self.connection(commit = False) as con:
+                return self.get_song_artists(song_path, connection = con)
+
+        artists = connection.execute(
+            self.read_command(Commands.GET_SONG_ARTISTS),
+            (str(song_path),)
+        ).fetchall()
+
+        return [row[0] for row in artists]
 
     def get_all_songs(self) -> list[Song]:
         """
@@ -104,12 +162,16 @@ class Database:
                 self.read_command(Commands.SELECT_ALL_SONGS)
             ).fetchall()
 
+
             for path, title, play_count, listen_time in result:
+                song_path = Path(path)
+
                 songs.append(Song(
-                    path = Path(path),
+                    path = song_path,
                     custom_title = title,
                     play_count = play_count,
-                    listen_time = listen_time
+                    listen_time = listen_time,
+                    artists = self.get_song_artists(path, connection = con)
                 ))
 
             return songs

@@ -40,14 +40,59 @@ ApplicationWindow {
 
         MahouMenu {
             title: "Controls"
+
+            Action {
+                text: "Play/Pause"
+            }
+
+            Action {
+                text: "Previous Song"
+            }
+
+            Action {
+                text: "Next Song"
+            }
+
+            Action {
+                text: "Restart Song"
+            }
+
         }
 
         MahouMenu {
             title: "Theme"
+
+            Action {
+                text: "Dark"
+            }
+
+            Action {
+                text: "Light"
+            }
+
+            Action {
+                text: "Habanero"
+            }
+
+            Action {
+                text: "Monochrome"
+            }
         }
 
         MahouMenu {
             title: "Help"
+
+            Action {
+                text: "About Mahou..."
+            }
+
+            Action {
+                text: "GitHub"
+            }
+
+            Action {
+                text: "Go to website"
+            }
         }
     }
 

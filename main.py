@@ -1,5 +1,5 @@
 import sys
-from ongaku.app import App
+from ongaku.core.app import App
 
 def main():
     app = App()

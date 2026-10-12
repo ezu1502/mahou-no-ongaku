@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ongaku.app import App
-    from ongaku.list_model import ListProxy
+    from ongaku.core.app import App
+    from ongaku.core.list_model import ListProxy
 
 from PySide6.QtCore import QUrl, QObject, Slot, Property, Signal
 from PySide6.QtQml import QQmlApplicationEngine

@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 lazy from PySide6.QtCore import QAbstractListModel, QByteArray, QSortFilterProxyModel, QModelIndex, Qt
-from ongaku.song import Song
+from ongaku.core.song import Song
 from contextlib import contextmanager
 
 if TYPE_CHECKING:
-    from ongaku.app import App
+    from ongaku.core.app import App
     from ongaku.database.database import Database
 
 Roles = Qt.ItemDataRole

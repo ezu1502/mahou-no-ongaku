@@ -1,9 +1,9 @@
 from ongaku.ui.window import Window
 from ongaku.database.database import Database
-from ongaku.folder_scanner import scan_folder
-from ongaku.list_model import ListModel, ListProxy
-from ongaku.player import Player
-from ongaku.enums import PlayerState as PS
+from ongaku.core.folder_scanner import scan_folder
+from ongaku.core.list_model import ListModel, ListProxy
+from ongaku.core.player import Player
+from ongaku.core.enums import PlayerState as PS
 from pathlib import Path
 
 class App():

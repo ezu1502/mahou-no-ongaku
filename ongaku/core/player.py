@@ -1,15 +1,20 @@
 from __future__ import annotations
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PySide6.QtCore import QObject, QUrl
+from PySide6.QtCore import QObject, QUrl, Signal
 
 from pathlib import Path
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ongaku.app import App
+    from ongaku.core.app import App
 
 class Player(QObject):
+    positionChanged = Signal(int)
+    durationChanged = Signal(int)
+
+    # todo CONTINUAR AQUI! Linkar sinal ao Qml pra controlar a progressbar
+
     def __init__(self, app: App):
         super().__init__()
 
@@ -19,6 +24,9 @@ class Player(QObject):
         self.output = QAudioOutput()
 
         self.media.setAudioOutput(self.output)
+
+        self.media.durationChanged.connect(self.durationChanged)
+        self.media.positionChanged.connect(self.positionChanged)
 
 
     def load_path(self, song_path: Path) -> None:

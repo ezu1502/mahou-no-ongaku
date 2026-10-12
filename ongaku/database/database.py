@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 from ongaku.database.commands import SQLCommands as Commands
-from ongaku.song import Song
+from ongaku.core.song import Song
 
 class Database:
     def __init__(self, app):

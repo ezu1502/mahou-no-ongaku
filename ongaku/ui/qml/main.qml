@@ -60,6 +60,15 @@ ApplicationWindow {
         }
 
         MahouMenu {
+            title: "Options"
+
+            Action {
+                text: "Folder Scan Mode"
+                // TODO colocar os modos: recursivo, ignorar subpastas etc.
+            }
+        }
+
+        MahouMenu {
             title: "Theme"
 
             Action {
@@ -124,6 +133,13 @@ ApplicationWindow {
             }
         }
     }
+
+    MahouProgressBar {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 40
+
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
     
 
     Row {
@@ -133,7 +149,7 @@ ApplicationWindow {
 
         anchors.margins: 20
         spacing: 5
-
+        
         PlaybackButton {
 
             imagePath: "../assets/previous_icon.png"

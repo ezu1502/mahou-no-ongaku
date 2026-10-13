@@ -12,13 +12,17 @@ QtObject {
             mahouHighlight: "#6f33df",
 
             surface: "#222222",
+            surfaceHover: "#333333",
+            surfacePressed: "#444444",
+
             progressBackground: "#303030",
             progress: "#8744a1",
             preciseMode: "#833f4a",
             secondaryText: "#888888",
 
             navBackground: "#6f33df",
-            navHover: "#916e9e",
+            navHover: '#8659da',
+            navPressed: '#9d85ca',
             navText: "#111111"
         },
 
@@ -28,6 +32,9 @@ QtObject {
             mahouHighlight: '#472486',
 
             surface: "#999999",
+            surfaceHover: "#888888",
+            surfacePressed: "#777777",
+
             progressBackground: "#888888",
             progress: "#472486",
             preciseMode: "#833f4a",

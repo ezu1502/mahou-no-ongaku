@@ -183,6 +183,8 @@ ApplicationWindow {
             bgHoverColor: ThemeVision.surface
             bgPressedColor: ThemeVision.surface
 
+            iconColor: ThemeVision.foreground
+
             onClicked: {
                 if (progressBar.progressPercent * progressBar.durationSeconds > 5){
                     backend.restart_song();
@@ -197,7 +199,12 @@ ApplicationWindow {
         PlaybackButton {
             imagePath: backend.app_state !== "playing" ? "../../assets/play_icon.png" : "../../assets/pause_icon.png"
             imageSize: 20
-    
+
+            bgColor: ThemeVision.mahouHighlight
+            bgHoverColor: ThemeVision.navHover
+            bgPressedColor: ThemeVision.navPressed
+
+            iconColor: ThemeVision.background
             onClicked: {
                 backend.toggle()
             }
@@ -211,6 +218,8 @@ ApplicationWindow {
             bgHoverColor: ThemeVision.surface
             bgPressedColor: ThemeVision.surface
 
+            iconColor: ThemeVision.foreground
+
             onClicked: {
                 backend.change_song(1);
             }
@@ -223,6 +232,8 @@ ApplicationWindow {
             bgColor: "transparent"
             bgHoverColor: ThemeVision.surface
             bgPressedColor: ThemeVision.surface
+            iconColor: ThemeVision.foreground
+
 
             onClicked: {
                 backend.stop_player();

@@ -30,7 +30,7 @@ ListView {
         width: root.width
         height: 50
 
-        color: index === root.currentIndex ? ThemeVision.progressBackground : ThemeVision.surface // todo implementar nova cor aqui tbm
+        color: index === root.currentIndex ? ThemeVision.surfaceHover : ThemeVision.surface // todo implementar nova cor aqui tbm
 
         Behavior on color {
             ColorAnimation {

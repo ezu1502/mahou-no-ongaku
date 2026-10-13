@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import Qt5Compat.GraphicalEffects
+
 import ".."
 Button {
     id: root
@@ -9,7 +11,9 @@ Button {
     
     property color bgColor: ThemeVision.mahouHighlight
     property color bgHoverColor: ThemeVision.navHover
-    property color bgPressedColor: "#b199dd" // todo implementar cor nova aqui
+    property color bgPressedColor: ThemeVision.surfacePressed // todo implementar cor nova aqui
+
+    property color iconColor: "#FF0000"
 
     property string imagePath: ""
     property int imageSize: 15
@@ -29,6 +33,7 @@ Button {
 
     contentItem: Item {
         Image {
+            id: icon
             source: root.imagePath
             
             width: root.imageSize
@@ -37,8 +42,19 @@ Button {
 
             fillMode: Image.PreserveAspectFit
 
-            anchors.centerIn: parent
-        
-        }   
+            anchors.centerIn: parent          
+        }  
+
+        ColorOverlay {
+            anchors.fill: icon
+            source: icon
+            color: root.iconColor
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: 100
+                }
+            }
+        }
     }
 }

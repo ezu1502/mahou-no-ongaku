@@ -1,31 +1,28 @@
-import os
-os.environ["BOCCA_HIDE_GREETING"] = "1"
+import sys
+from ongaku.core.app import App
 
-from mahou_libs.time_functions import TimeCounter
+def main():
+    app = App()
+    app.run()
 
-with TimeCounter("main.py imports"):
-    os.environ["QT_LOGGING_RULES"] = "qt.multimedia.ffmpeg.*=false"
-    os.environ.pop("QT_FFMPEG_DEBUG", None)
-    from mahou_libs import bocca
+if __name__ == "__main__":
+    sys.exit(main())
 
-    from mahou_libs.colors import painted_string
-    from mahou.core.app import App
+# todo próximos passos
+
+# done colocar sistema de temas 
+# done escolher a paleta dos outros temas, implementar mais duas cores (ficou faltando)
+# implementar detecção de tempo ouvido pra estatísticas como listen_time ou play_count
+
+# todo depois:
+
+# conseguir mostrar arte do álbum junto com o nome da música
+# terminar sistema de álbuns, playlists e genres
+# permitir colocar tags em músicas, como #dahora
+# ? talvez reescrever metadata da música se conveniente?
+# implementar análise do bunseki (em paralelo, usar asyncio ou threading)
 
 
-log = bocca.BoccaFiglia("main", "#FFAE00") 
-bocca.configure_default_settings()
-bocca.set_core_level(11) # Nível do logger
 
-program_is_running = True
 
-launch_message = painted_string(f"{'Program Started.':<30}", "#FF2222")
-end_message = painted_string(f"{'Program Terminated.':<30}", "#FF2222")
 
-log.info(f"{launch_message}")   
-
-try:
-    if __name__ == "__main__":
-        mahou_app = App()
-        mahou_app.run()
-finally:
-    log.info(end_message)

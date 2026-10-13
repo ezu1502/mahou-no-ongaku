@@ -43,6 +43,9 @@ ApplicationWindow {
                 onTriggered: {
                     folderDialog.open()
                 }
+
+                shortcut: "Ctrl+O"
+                
             }
         }
 
@@ -51,10 +54,18 @@ ApplicationWindow {
 
             Action {
                 text: "Play/Pause"
+
+                shortcut: "Space"
+
+                onTriggered: {
+                    backend.toggle();
+                }
             }
 
             Action {
                 text: "Stop"
+
+                shortcut: "S"
 
                 onTriggered: {
                     backend.stop_player();
@@ -63,14 +74,33 @@ ApplicationWindow {
 
             Action {
                 text: "Previous Song"
+
+                shortcut: "Left"
+
+                onTriggered: {
+                    backend.change_song(-1);
+                }
             }
 
             Action {
                 text: "Next Song"
+
+                shortcut: "Right"
+
+                onTriggered: {
+                    backend.change_song(1);
+                }
             }
 
             Action {
                 text: "Restart Song"
+
+                shortcut: "R"
+
+
+                onTriggered: {
+                    backend.restart_song();
+                }
             }
 
         }
@@ -91,23 +121,47 @@ ApplicationWindow {
                 text: "Dark"
 
                 onTriggered: {
-                    ThemeManager.setTheme("Dark")
+                    ThemeManager.setTheme("Dark");
                 }
             }
 
             Action {
                 text: "Light"
                 onTriggered: {
-                    ThemeManager.setTheme("Light")
+                    ThemeManager.setTheme("Light");
                 }
             }
 
             Action {
                 text: "Habanero"
+
+                onTriggered: {
+                    ThemeManager.setTheme("Habanero");
+                }
             }
 
             Action {
                 text: "Monochrome"
+
+                onTriggered: {
+                    ThemeManager.setTheme("Monochrome");
+                }
+            }
+
+            Action {
+                text: "Cheesecake"
+
+                onTriggered: {
+                    ThemeManager.setTheme("Cheesecake");
+                }
+            }
+
+            Action {
+                text: "Future"
+
+                onTriggered: {
+                    ThemeManager.setTheme("Future");
+                }
             }
         }
 
@@ -242,29 +296,6 @@ ApplicationWindow {
     }
 
 
-    Shortcut {
-        sequence: "S"
-        onActivated: backend.stop_player()
-    }
-
-    Shortcut {
-        sequence: "Space"
-        onActivated: backend.toggle()
-    }
-
-    Shortcut {
-        sequence: "Left"
-        onActivated: backend.change_song(-1)
-    }
-
-    Shortcut {
-        sequence: "R"
-        onActivated: backend.restart_song()
-    }
-    Shortcut {
-        sequence: "Right"
-        onActivated: backend.change_song(1)
-    }
 
     Shortcut {
         sequence: "Esc"

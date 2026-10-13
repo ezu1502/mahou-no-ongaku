@@ -28,9 +28,10 @@ ListView {
         id: delegateRect
 
         width: root.width
-        height: 50
+        height: 60
 
-        color: index === root.currentIndex ? ThemeVision.surfaceHover : ThemeVision.surface // todo implementar nova cor aqui tbm
+        color: index === root.currentIndex ? ThemeVision.surfaceHover : ThemeVision.surface
+        // color: index === root.currentIndex ? ThemeVision.surfacePressed : index % 2 === 0 ? ThemeVision.surfaceHover : ThemeVision.surface
 
         Behavior on color {
             ColorAnimation {

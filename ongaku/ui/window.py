@@ -11,8 +11,13 @@ from PySide6.QtCore import QUrl, QObject, Slot, Property, Signal
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtGui import QGuiApplication, QFontDatabase
 
+from ongaku.core.enums import PlayerState as PS
+
 class BackEnd(QObject):
     app_state_changed = Signal()
+
+    positionChanged = Signal(int)
+    durationChanged = Signal(int)
 
     def __init__(self, window: Window):
         super().__init__()
@@ -21,6 +26,11 @@ class BackEnd(QObject):
         self.app = self.window.app
 
         self.selected_path: Path | None = None
+        
+    def connect_signals(self) -> None:
+        self.app.player.positionChanged.connect(self.positionChanged)
+        self.app.player.durationChanged.connect(self.durationChanged)
+
 
     @Property(str, notify = app_state_changed)
     def app_state(self):
@@ -47,6 +57,36 @@ class BackEnd(QObject):
     @Slot()
     def toggle(self) -> None:
         self.app.toggle(self.selected_path)
+
+    @Slot(int)
+    def set_player_position(self, position: int):
+        """
+            Receives a position in milliseconds and tells Player to update itself
+        """
+        self.app.player.set_position(position)
+
+    @Slot()
+    def stop_player(self):
+        self.app.player.stop(unload = True)
+
+        self.app.set_state(PS.MENU)
+
+    @Slot(int)
+    def change_song(self, delta: int) -> None:
+        if delta not in (-1, 1):
+            return
+        
+        self.app.change_song(delta)
+
+    @Slot()
+    def restart_song(self) -> None:
+        self.app.restart_song()
+        
+        
+        
+
+        
+
 
 class Window:
     def __init__(self, app: App) -> None:

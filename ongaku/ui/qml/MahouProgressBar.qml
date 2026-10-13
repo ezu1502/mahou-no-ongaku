@@ -16,9 +16,13 @@ Item {
     property bool preciseMode: false
 
     property int durationSeconds: 0 
-    property int playerProgress: 0
 
+    function format_time(seconds){
+        let minutes = Math.floor(seconds / 60);
+        let secs = Math.floor(seconds % 60);
 
+        return minutes + ":" + String(secs).padStart(2, "0");
+    }
 
     Rectangle {
         id: track
@@ -53,7 +57,7 @@ Item {
         MahouTitle {
             id: progressLabel
 
-            text: "0:00 / "
+            text: root.format_time(root.progressPercent * root.durationSeconds) + " / "
 
             font.pixelSize: 16
         }
@@ -61,7 +65,7 @@ Item {
         MahouTitle {
             id: durationLabel
 
-            text: "0:00"
+            text: root.format_time(root.durationSeconds)
 
             font.pixelSize: 16
 
@@ -71,6 +75,7 @@ Item {
     }
     
     MouseArea {
+        id: mouseArea
         anchors.fill: track
 
         property real lastMouseX: 0
@@ -114,12 +119,31 @@ Item {
             lastMouseX = mouse.x
         }
 
-        onDoubleClicked: (mouse) => {
-            root.progressPercent = clamp((mouse.x) / track.width, 0, 1);
-        }
-
         onReleased: {
             root.preciseMode = false;
+
+            backend.set_player_position(root.progressPercent * root.durationSeconds * 1000);
+        }
+    }
+
+    Connections {
+        target: backend
+
+        function onPositionChanged(position){
+            if (mouseArea.pressed){
+                return;
+            }
+                
+            if (root.durationSeconds > 0){
+                root.progressPercent = ((position / 1000) / root.durationSeconds);
+            }
+            else {
+                root.progressPercent = 0;
+            }
+        }
+
+        function onDurationChanged(duration){
+            root.durationSeconds = (duration / 1000);
         }
     }
 

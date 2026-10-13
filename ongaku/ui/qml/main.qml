@@ -3,6 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Dialogs
 
 ApplicationWindow {
+    id: window
     visible: true
 
     width: 1280
@@ -43,6 +44,14 @@ ApplicationWindow {
 
             Action {
                 text: "Play/Pause"
+            }
+
+            Action {
+                text: "Stop"
+
+                onTriggered: {
+                    backend.stop_player();
+                }
             }
 
             Action {
@@ -135,6 +144,7 @@ ApplicationWindow {
     }
 
     MahouProgressBar {
+        id: progressBar
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
 
@@ -158,6 +168,16 @@ ApplicationWindow {
             bgColor: "transparent"
             bgHoverColor: "#222222"
             bgPressedColor: "#222222"
+
+            onClicked: {
+                if (progressBar.progressPercent * progressBar.durationSeconds > 5){
+                    backend.restart_song();
+                }
+                else {  
+                    backend.change_song(-1);
+                }
+
+            }
         }
 
         PlaybackButton {
@@ -176,6 +196,10 @@ ApplicationWindow {
             bgColor: "transparent"
             bgHoverColor: "#222222"
             bgPressedColor: "#222222"
+
+            onClicked: {
+                backend.change_song(1);
+            }
         }
 
         PlaybackButton {
@@ -185,7 +209,52 @@ ApplicationWindow {
             bgColor: "transparent"
             bgHoverColor: "#222222"
             bgPressedColor: "#222222"
+
+            onClicked: {
+                backend.stop_player();
+            }
         }
     }
 
+
+    Shortcut {
+        sequence: "S"
+        onActivated: backend.stop_player()
+    }
+
+    Shortcut {
+        sequence: "Space"
+        onActivated: backend.toggle()
+    }
+
+    Shortcut {
+        sequence: "Left"
+        onActivated: backend.change_song(-1)
+    }
+
+    Shortcut {
+        sequence: "R"
+        onActivated: backend.restart_song()
+    }
+    Shortcut {
+        sequence: "Right"
+        onActivated: backend.change_song(1)
+    }
+
+    Shortcut {
+        sequence: "Esc"
+        onActivated: {
+            if (window.visibility === Window.FullScreen)
+                window.visibility = Window.Windowed;
+        }
+    }
+
+    Shortcut {
+        sequence: "F11"
+        onActivated: {
+            window.visibility = window.visibility === Window.FullScreen ? Window.Windowed : Window.FullScreen;
+        }
+    }
+
+    
 }

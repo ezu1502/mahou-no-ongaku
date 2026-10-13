@@ -14,7 +14,7 @@ class Database:
         schema = self.read_command(Commands.SCHEMA)
 
         with self.connection() as con:
-            print(schema)
+            # print(schema)
             con.executescript(
                 "BEGIN;\n"
                 + schema

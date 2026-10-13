@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Dict
 lazy from PySide6.QtCore import QAbstractListModel, QByteArray, QSortFilterProxyModel, QModelIndex, Qt
 from ongaku.core.song import Song
 from contextlib import contextmanager
+from pathlib import Path
 
 if TYPE_CHECKING:
     from ongaku.core.app import App
@@ -71,3 +72,30 @@ class ListProxy(QSortFilterProxyModel):
         self.list_model: ListModel = model
 
         self.setSourceModel(self.list_model)
+
+    def find_song_row(self, song_path: Path) -> int:
+        """
+            Finds a song's row in the songlist based on its path.
+        """
+        
+
+
+        for row in range(self.rowCount()):
+            index = self.index(row, 0)
+            path = self.data(index, Roles.UserRole + 1)
+
+            if path == str(song_path):
+                return row
+        return -1
+
+    def find_song_path(self, row: int) -> Path | None:
+        """
+            Finds a song's Path based on its row in the songlist.
+        """
+        if not 0 <= row <= self.rowCount():
+            return None
+        
+        index = self.index(row, 0)
+        path = self.data(index, Roles.UserRole + 1)
+
+        return Path(path) if path else None

@@ -13,24 +13,33 @@ class Player(QObject):
     positionChanged = Signal(int)
     durationChanged = Signal(int)
 
-    # todo CONTINUAR AQUI! Linkar sinal ao Qml pra controlar a progressbar
-
     def __init__(self, app: App):
         super().__init__()
 
         self.app: App = app
 
-        self.media = QMediaPlayer()
-        self.output = QAudioOutput()
+        self.media = QMediaPlayer(self)
+        self.output = QAudioOutput(self)
 
         self.media.setAudioOutput(self.output)
 
-        self.media.durationChanged.connect(self.durationChanged)
-        self.media.positionChanged.connect(self.positionChanged)
+        self.media.durationChanged.connect(self._on_duration_changed)
+        self.media.positionChanged.connect(self._on_position_changed)
 
+        self.loaded_path: Path | None = None
+
+    def _on_duration_changed(self, duration: int) -> None:
+        self.durationChanged.emit(duration)
+
+    def _on_position_changed(self, position: int) -> None:
+        self.positionChanged.emit(position)
+
+    def set_position(self, position_ms: int) -> None:
+        self.media.setPosition(position_ms)
 
     def load_path(self, song_path: Path) -> None:
         self.media.setSource(QUrl.fromLocalFile(str(song_path)))
+        self.loaded_path = song_path
 
     def play(self) -> None:
         self.media.play()
@@ -50,3 +59,5 @@ class Player(QObject):
 
         if unload:
             self.media.setSource(QUrl())
+
+        self.durationChanged.emit(0)

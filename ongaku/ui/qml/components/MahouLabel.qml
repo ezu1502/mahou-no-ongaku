@@ -1,10 +1,10 @@
 import QtQuick
-import QtQuick.Controls.Basic
+import ".."
 
 Text {
     id: root
 
-    color: "#EEEEEE"
+    color: ThemeVision.foreground
 
     font.pixelSize: 18
 

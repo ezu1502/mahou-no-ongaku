@@ -2,6 +2,8 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls.Basic
+import ".."
+
 
 ListView {
     signal songSelected(string path)
@@ -28,7 +30,7 @@ ListView {
         width: root.width
         height: 50
 
-        color: index === root.currentIndex ? "#333333" : "#222222"
+        color: index === root.currentIndex ? ThemeVision.progressBackground : ThemeVision.surface // todo implementar nova cor aqui tbm
 
         Behavior on color {
             ColorAnimation {
@@ -51,7 +53,7 @@ ListView {
             MahouLabel {    
                 text: delegateRect.artists
                 font.pixelSize: 15
-                color: "#AAAAAA"    
+                color: ThemeVision.secondaryText
                 verticalAlignment: Text.AlignVCenter
 
             }

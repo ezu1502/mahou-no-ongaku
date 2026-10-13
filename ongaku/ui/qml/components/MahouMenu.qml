@@ -1,13 +1,13 @@
 import QtQuick
 import QtQuick.Controls.Basic
-
+import ".."
 Menu {
     id: root
     implicitWidth: 200
     padding: 1
     
     background: Rectangle {
-        color: "#222222"
+        color: ThemeVision.surface
         radius: 5
 
         border.color: "#666666"
@@ -21,7 +21,7 @@ Menu {
 
 
         background: Rectangle {
-            color: menuItem.highlighted ? "#333333" : "transparent"
+            color: menuItem.highlighted ? ThemeVision.progressBackground: "transparent"
             radius: 5
 
             anchors.rightMargin: 4
@@ -33,7 +33,7 @@ Menu {
             text: menuItem.text
             verticalAlignment: Text.AlignVCenter
 
-            color: "#EEEEEE"
+            color: ThemeVision.foreground
             font.pixelSize: 14
 
             leftPadding: 12

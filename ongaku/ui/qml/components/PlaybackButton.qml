@@ -1,15 +1,15 @@
 import QtQuick
 import QtQuick.Controls.Basic
-
+import ".."
 Button {
     id: root
 
     width: 50
     height: 50
     
-    property color bgColor: "#8744a1"
-    property color bgHoverColor: "#804fdb"
-    property color bgPressedColor: "#b199dd"
+    property color bgColor: ThemeVision.mahouHighlight
+    property color bgHoverColor: ThemeVision.navHover
+    property color bgPressedColor: "#b199dd" // todo implementar cor nova aqui
 
     property string imagePath: ""
     property int imageSize: 15

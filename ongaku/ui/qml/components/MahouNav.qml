@@ -1,18 +1,18 @@
 import QtQuick
 import QtQuick.Controls.Basic
-
+import ".."
 MenuBar {
     id: mahouNav
 
     background: Rectangle {
-        color: '#8744a1'
+        color: ThemeVision.navBackground
     }
 
     delegate: MenuBarItem {
         id: menuItem
 
         background: Rectangle {
-            color: menuItem.highlighted ? '#916e9e' : "#8744a1"
+            color: menuItem.highlighted ? ThemeVision.navHover: ThemeVision.navBackground
             radius: 5
 
             Behavior on color {
@@ -32,7 +32,7 @@ MenuBar {
             font.family: "Noto Sans"
             font.pixelSize: 14
 
-            color: "#111111"
+            color: ThemeVision.navText
         }
     }
 }

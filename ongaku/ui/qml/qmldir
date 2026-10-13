@@ -1,0 +1,3 @@
+singleton ThemeVision 1.0 ThemeVision.qml
+singleton Themes 1.0 Themes.qml
+singleton ThemeManager 1.0 ThemeManager.qml

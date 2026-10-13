@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import ".."
 
 Button {
     id: root
@@ -7,11 +8,9 @@ Button {
     implicitWidth: 180
     implicitHeight: 60
 
-    
-
     background: Rectangle {
         anchors.fill: parent
-        color: root.hovered ? "#444444" : "#333333"
+        color: root.hovered ? ThemeVision.navHover : ThemeVision.surface
         radius: 10
     }
 
@@ -25,6 +24,6 @@ Button {
         font.family: "Noto Sans"
 
         text: root.text
-        color: "#EEEEEE"
+        color: ThemeVision.foreground
     }
 }

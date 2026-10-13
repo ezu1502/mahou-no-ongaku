@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Dialogs
 
+import "./components"
+import "."
+
 ApplicationWindow {
     id: window
     visible: true
@@ -10,9 +13,13 @@ ApplicationWindow {
     height: 720
 
     title: "Mahou no Ongaku"
-    color: "#111111"
+    color: ThemeVision.background
 
-
+    Behavior on color {
+        ColorAnimation {
+            duration: 100
+        }
+    }
     Component.onCompleted: showMaximized()
 
 
@@ -82,10 +89,17 @@ ApplicationWindow {
 
             Action {
                 text: "Dark"
+
+                onTriggered: {
+                    ThemeManager.setTheme("Dark")
+                }
             }
 
             Action {
                 text: "Light"
+                onTriggered: {
+                    ThemeManager.setTheme("Light")
+                }
             }
 
             Action {
@@ -162,12 +176,12 @@ ApplicationWindow {
         
         PlaybackButton {
 
-            imagePath: "../assets/previous_icon.png"
+            imagePath: "../../assets/previous_icon.png"
             imageSize: 15
 
             bgColor: "transparent"
-            bgHoverColor: "#222222"
-            bgPressedColor: "#222222"
+            bgHoverColor: ThemeVision.surface
+            bgPressedColor: ThemeVision.surface
 
             onClicked: {
                 if (progressBar.progressPercent * progressBar.durationSeconds > 5){
@@ -181,7 +195,7 @@ ApplicationWindow {
         }
 
         PlaybackButton {
-            imagePath: backend.app_state !== "playing" ? "../assets/play_icon.png" : "../assets/pause_icon.png"
+            imagePath: backend.app_state !== "playing" ? "../../assets/play_icon.png" : "../../assets/pause_icon.png"
             imageSize: 20
     
             onClicked: {
@@ -190,12 +204,12 @@ ApplicationWindow {
         }
 
         PlaybackButton {
-            imagePath: "../assets/next_icon.png"
+            imagePath: "../../assets/next_icon.png"
             imageSize: 15
 
             bgColor: "transparent"
-            bgHoverColor: "#222222"
-            bgPressedColor: "#222222"
+            bgHoverColor: ThemeVision.surface
+            bgPressedColor: ThemeVision.surface
 
             onClicked: {
                 backend.change_song(1);
@@ -203,12 +217,12 @@ ApplicationWindow {
         }
 
         PlaybackButton {
-            imagePath: "../assets/stop_icon.png"
+            imagePath: "../../assets/stop_icon.png"
             imageSize: 13
 
             bgColor: "transparent"
-            bgHoverColor: "#222222"
-            bgPressedColor: "#222222"
+            bgHoverColor: ThemeVision.surface
+            bgPressedColor: ThemeVision.surface
 
             onClicked: {
                 backend.stop_player();

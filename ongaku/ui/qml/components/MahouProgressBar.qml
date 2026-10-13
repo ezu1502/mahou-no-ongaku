@@ -2,15 +2,16 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls.Basic
+import ".."
 
 Item {
     id: root
     width: 300
     height: 10
 
-    property color bg: "#303030"
-    property color progressColor: "#8744a1"
-    property color preciseModeColor: '#833f4a'
+    property color bg: ThemeVision.progressBackground
+    property color progressColor: ThemeVision.progress
+    property color preciseModeColor: ThemeVision.preciseMode
 
     property real progressPercent: 0
     property bool preciseMode: false
@@ -69,7 +70,7 @@ Item {
 
             font.pixelSize: 16
 
-            color: "#888888"
+            color: ThemeVision.secondaryText
         }
 
     }
